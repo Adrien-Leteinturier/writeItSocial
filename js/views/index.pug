@@ -1,0 +1,138 @@
+doctype html
+html
+  head
+    title Write it Social - Le reseaux social accessible à tous - Home page
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
+    link(rel='stylesheet', href='foundation-icons/foundation-icons.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Raleway:400,600')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')
+    link(rel='stylesheet', href='style.css')
+    link(rel='stylesheet', href='jsUiBase.css')
+  body
+    section#banner
+      #containerIndex.row
+        .col-sm-12.col-xs-12
+          section#loginForm
+            a(href='/')
+              img.logo-index(src='logo-index.png')
+            #lineDiviser
+            #formWrapper
+              p.textFormWrapper|Inscrivez-vous dès maintenant et rencontrez des gens formidables 
+              form#login(method='POST',action='connexion')
+                input#pseudo(type='text',name='pseudo',placeholder='Pseudo')
+                input#password(type='password',name='password',placeholder='Password')
+                button#submit.button-connexion.btnSubmit|Connexion
+            a.linkInscription(href='inscription', alt='Inscription')|Inscription?
+            a.linkInscription(href='mdpLost',alt='Mot de passe oublier')|Mot de passe oublier?
+            img.formShadow(src='bottom-shadow.png')
+    section#features
+      #containerIndex.wrapper.row
+        h1.section-titre|Write it Social
+        .col-lg-3.col-md-3.col-sm-6.col-xs-6
+          .feature-item.feature-icon.fi-plus
+          h3.titreIcon|Ecrire
+        .col-lg-3.col-md-3.col-sm-6.col-xs-6
+          .feature-item.feature-icon.fi-torso
+          h3.titreIcon|Gérer 
+        .col-lg-3.col-md-3.col-sm-6.col-xs-6
+          .feature-item.feature-icon.fi-comment
+          h3.titreIcon|Parler 
+        .col-lg-3.col-md-3.col-sm-6.col-xs-6
+          .feature-item.feature-icon.fi-x
+          h3.titreIcon|Quitter
+        h2.section-sub-titre|Trouver des gens fantastiques comme vous
+        .increment-compteur-live
+          .num
+        p|Personnes déjà inscrites
+        img.mapImageProfil(src='map.png')
+        h2.section-sub-titre|Rester connecté à tout moment, n'importe où
+        img.phoneImage(src='phoneIndex.png')
+      .img-diviser.hidden-sm.hidden-xs                                                       
+    section#compteurLive
+      #containerIndex
+        .cercle
+          ul.compteurLive-list
+            li
+              .compteurLive-icon
+                i.fi-torsos-male-female
+              h3.text-white.valueLogin
+              p|Personnes inscrites
+            li
+              .compteurLive-icon
+                i.fi-photo
+              h3.text-white.valuePost
+              p|Posts publiés
+            li
+              .compteurLive-icon
+                i.fi-check
+              h3.text-white.valueConnect
+              p|Personnes connectés       
+    section#liveFeed
+      #containerIndex
+        h1.section-titre|Flux en direct 
+        h2.section-sub-titre|Voir ce qui se passe maintenant
+        .row
+          .col-md-4.col-sm-6.col-md-offset-2
+            each feedLive1 in feedLiveArray1
+              .live-item
+                img.profil-photo-live(src=feedLive1.srcPhotoUser,alt='Utilisateurs')
+                .live-activ
+                  p
+                    a.link-live(href='#')=feedLive1.auteur
+                    |  à partager un Post 
+                  p.text-date=feedLive1.date    
+          .col-md-4.col-sm-6
+            each feedLive2 in feedLiveArray2
+              .live-item
+                img.profil-photo-live(src=feedLive2.srcPhotoUser,alt='Utilisateurs')
+                .live-activ
+                  p
+                    a.link-live(href='#')=feedLive2.auteur
+                    |  à partager un Post 
+                  p.text-date=feedLive2.date
+    section#footer
+      #containerIndex
+        .row
+          #footer-wrapper
+            .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
+              a(href='index',alt='Home')
+                img#logoFooter(src='logo-footer.png')
+              ul.socialList
+                li
+                  a(href='#',alt='Facebook')
+                    i.iconSocialFooter.fi-social-facebook
+                li
+                  a(href='#',alt='Twitter')
+                    i.iconSocialFooter.fi-social-twitter
+                li
+                  a(href='#',alt='Github')
+                    i.iconSocialFooter.fi-social-github
+                li
+                  a(href='#',alt='Linkedin')
+                    i.iconSocialFooter.fi-social-linkedin  
+            .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
+              ul.links-footer
+                li
+                  a(href='inscription',alt='Inscription')|Inscription
+                li
+                  a(href='#',alt='À propos')|À propos
+                li
+                  a(href='#',alt='Mentions Légales')|Mentions légales 
+            .col-lg-4.col-md-4.col-sm-12.col-xs-12
+              ul.contact-footer.text-center
+                li
+                  i.icon-contact.fi-mobile
+                  p.phone| 06-18-33-96-13
+                li
+                  i.icon-contact.fi-mail
+                  p.mail| adrienleteinturier@gmail.com
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
+    script(type='text/javascript', src='socket.io.js')
+    script(type='text/javascript', src='socketClient.js')
+    script(type='text/javascript', src='main_js_index.js')
+
+  

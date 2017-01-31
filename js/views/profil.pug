@@ -1,0 +1,99 @@
+doctype html
+html
+  head
+    title Adrien Leteinturier - Le blog DiwJS
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
+    link(rel='stylesheet', href='foundation-icons/foundation-icons.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Raleway:400,600')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')
+    link(rel='stylesheet', href='style.css')
+    link(rel='stylesheet', href='jsUiBase.css')
+  body
+    section#head.row
+      .col-lg-4.col-md-12.col-sm-12.col-xs-12
+        .Hitem1
+          a(href='/',title='Home')
+            h1  Adrien Leteinturier - Le blog DiwJS 
+        if(pseudo)
+          .row
+            .col-lg-6.col-md-6.col-sm-6.col-xs-6
+              span.login= 'Bonjour' + ' ' + pseudo
+            section.test.col-lg-6.col-md-6.col-sm-6.col-xs-6
+              a(href='/creation',title='Création d\'un article')
+                i.fi-plus
+              a(href='/profil',title='Votre profil')  
+                i.fi-torso
+                i.fi-comment
+              a(href='/deconnection',title='Déconnexion')
+                i.fi-x
+      if(!pseudo)           
+        .col-lg-4.col-md-12.col-sm-12.col-xs-12
+          .Hitem3
+            i.spriteLogo.sprite-login
+      if(pseudo)
+        .col-lg-4.col-md-12.col-sm-12.col-xs-12
+          .Hitem3.text-center
+            img#imgPro(src='/' + scrFile)
+      .col-lg-4.col-md-12.col-sm-12.col-xs-12    
+        if(pseudo)
+          #adv-search.input-group.searchBar
+            input.form-control(type='text', placeholder='Search for snippets')
+            .input-group-btn
+              .btn-group(role='group')
+                button.btn.btn-primary(type='button')
+                  span.glyphicon.glyphicon-search(aria-hidden='true')    
+        div#usersLiveCount
+        div#usersCountLog
+        div#postItsCountLog   
+    h2.titreNew Votre profil
+    section#profil.row
+      .col-lg-4.col-md-4.col-sm-4.col-xs-12.divProfil
+        .row
+          .col-lg-12.col-md-12.col-sm-12.col-xs-12
+            p.txtProfil1 Genre :
+              p.txtProfil2=genre          
+            p.txtProfil1 Age :
+              p.txtProfil2=age            
+            p.txtProfil1 Prenom :
+              p.txtProfil2=prenom
+            p.txtProfil1 Nom :
+              p.txtProfil2=nom
+            p.txtProfil1 Pseudo :
+              p.txtProfil2=pseudo
+            p.txtProfil1 Mot de passe :
+              p.txtProfil2=password
+            p.txtProfil1 E-mail :
+              p.txtProfil2(style='word-break: break-all;')=email
+            p.txtProfil1 Presentation :
+              p.txtProfil2=presentation              
+            p.txtProfil1 Image de Profil :
+              p
+                img#imgPro(src='/' + scrFile)
+            a.buttonInscription(href='/modifLogin', alt='Modifier votre profil')                    
+              input#logIn.spriteSubmit.sprite-modifier(type='image', value='')
+      .col-lg-4.col-md-4.col-sm-4.col-xs-12.divPost
+        .row
+          each postProfil in postAll
+            a(href='/post_its/' + postProfil._id,title= postProfil.titre)
+              .col-lg-12.col-md-12.col-sm-12.col-xs-12.postProfil
+                .row
+                  .col-lg-3.col-md-3.col-sm-3.col-xs-3.divTitlePostProfil
+                    p.titlePostProfil=postProfil.titre     
+                  .col-lg-4.col-md-4.col-sm-4.col-xs-4
+                    img#imgPostProfil(src='/' + postProfil.srcfile)
+                  .col-lg-7.col-md-7.col-sm-7.col-xs-
+                    p.textePostProfil=postProfil.texte
+                    p.labelDatePostProfil Date de création  
+                    p.datePostProfil=postProfil.date                  
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')    
+    script(type='text/javascript', src='socket.io.js')
+    script(type='text/javascript', src='socketClient.js')    
+    script(src='valid_form.js')          
+      
+   
+
+  
