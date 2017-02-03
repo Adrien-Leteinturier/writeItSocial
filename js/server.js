@@ -33,11 +33,12 @@ colors.setTheme({
 });
 
 app.set('view engine','pug'); // regarde dans un fichier views par default
-app.use(express.static("../css"));
-app.use(express.static("../images"));
+app.use(express.static("../public"));
+app.use(express.static("../public/css"));
+app.use(express.static("../public/images"));
 app.use(express.static("../js"));
-app.use(express.static("../uploads"));
-app.use(express.static("../imagesUi"));
+app.use(express.static("../public/uploads"));
+app.use(express.static("../public/imagesUi"));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('node_modules/socket.io/node_modules/socket.io-client/socket.io/', express.static(__dirname + '/node_modules/socket.io/node_modules/socket.io-client'))
