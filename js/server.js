@@ -317,18 +317,13 @@ app.get('/delete/:id',function(req,res){
   collectionPost_its.remove( {"_id":{"$oid":new ObjectId(req.params.id)}});
 });
 
-
-/*
 app.get('/profil',function(req,res){
   var pseudo = req.session.pseudo;
   if(req.session.pseudo){
     collectionPost_its.find({auteur:pseudo}).sort({date : -1}).toArray(function(err, data) {
-      for(var i=0;data[i];i++){
-        data[i].texte = tools.fonctionCouperTextePourApercu(data[i].texte,0,140);
-      }
       collectionUsers.find({pseudo:pseudo},{
-        
-        _id:0,
+       
+        _id:1,
         genre:1,
         age:1,
         prenom:1,
@@ -337,9 +332,11 @@ app.get('/profil',function(req,res){
         password:1,
         email:1,
         srcfile:1,
-        presentation:1
+        presentation:1,
+        friends:1
 
       }).toArray(function(err, result) {
+        console.log(result[0].srcfile)
 
         res.render('profil',{
           genre:result[0].genre,
@@ -350,7 +347,9 @@ app.get('/profil',function(req,res){
           password:result[0].password, 
           email:result[0].email,
           presentation: result[0].presentation, 
-          scrFile: result[0].srcfile,
+          srcfile: result[0].srcfile,
+          friends: result[0].friends.length,
+          scrFileFriend:result[0].friends,
           postAll: data
           });
       });
@@ -410,7 +409,7 @@ app.post('/modifLogin',upload.single('recfile'),function(req,res){
     }); 
 });
 
-*/
+
 
 
 

@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title Adrien Leteinturier - Le blog DiwJS
+    title Adrien Leteinturier - Write It Social
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
     link(rel='stylesheet', href='foundation-icons/foundation-icons.css')
@@ -11,89 +11,157 @@ html
     link(rel='stylesheet', href='style.css')
     link(rel='stylesheet', href='jsUiBase.css')
   body
-    section#head.row
-      .col-lg-4.col-md-12.col-sm-12.col-xs-12
-        .Hitem1
-          a(href='/',title='Home')
-            h1  Adrien Leteinturier - Le blog DiwJS 
-        if(pseudo)
-          .row
-            .col-lg-6.col-md-6.col-sm-6.col-xs-6
-              span.login= 'Bonjour' + ' ' + pseudo
-            section.test.col-lg-6.col-md-6.col-sm-6.col-xs-6
-              a(href='/creation',title='Création d\'un article')
-                i.fi-plus
-              a(href='/profil',title='Votre profil')  
-                i.fi-torso
-                i.fi-comment
-              a(href='/deconnection',title='Déconnexion')
-                i.fi-x
-      if(!pseudo)           
-        .col-lg-4.col-md-12.col-sm-12.col-xs-12
-          .Hitem3
-            i.spriteLogo.sprite-login
-      if(pseudo)
-        .col-lg-4.col-md-12.col-sm-12.col-xs-12
-          .Hitem3.text-center
-            img#imgPro(src='/' + scrFile)
-      .col-lg-4.col-md-12.col-sm-12.col-xs-12    
-        if(pseudo)
-          #adv-search.input-group.searchBar
-            input.form-control(type='text', placeholder='Search for snippets')
-            .input-group-btn
-              .btn-group(role='group')
-                button.btn.btn-primary(type='button')
-                  span.glyphicon.glyphicon-search(aria-hidden='true')    
-        div#usersLiveCount
-        div#usersCountLog
-        div#postItsCountLog   
-    h2.titreNew Votre profil
-    section#profil.row
-      .col-lg-4.col-md-4.col-sm-4.col-xs-12.divProfil
+    section#head
+      nav.navbar.navbar-default.navbar-fixed-top.menu
+        .container
+          .navbar-header
+            button.navbar-toggle.collapsed.in(type='button',data-toggle='collapse',data-target='#bs-example-navbar-collapse-1')
+              span.sr-only|Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='index')
+              img(src='logo-navbar.png',alt='logo')  
+          #bs-example-navbar-collapse-1.navbar-collapse.collapse
+            ul.nav.navbar-nav.navbar-right.main-menu
+              li.dropdown
+                a(href='#')|Home
+              li.dropdown
+                a(href='#')|À propos
+              li.dropdown
+                a(href='#')|Profil
+              li.dropdown
+                a(href='#')|Chat
+              li.dropdown
+                a(href='#')|Mentions légales
+            form.navbar-form.navbar-right.hidden-sm.form-search-bar
+              .form-group
+                i.icon.fi-magnifying-glass
+                input.form-control.search-bar(type='text',name='search',placeholder='Recherche des amis') 
+          .row.text-center
+            #resultSearch
+    .page-dashboard
+      .container
         .row
-          .col-lg-12.col-md-12.col-sm-12.col-xs-12
-            p.txtProfil1 Genre :
-              p.txtProfil2=genre          
-            p.txtProfil1 Age :
-              p.txtProfil2=age            
-            p.txtProfil1 Prenom :
-              p.txtProfil2=prenom
-            p.txtProfil1 Nom :
-              p.txtProfil2=nom
-            p.txtProfil1 Pseudo :
-              p.txtProfil2=pseudo
-            p.txtProfil1 Mot de passe :
-              p.txtProfil2=password
-            p.txtProfil1 E-mail :
-              p.txtProfil2(style='word-break: break-all;')=email
-            p.txtProfil1 Presentation :
-              p.txtProfil2=presentation              
-            p.txtProfil1 Image de Profil :
-              p
-                img#imgPro(src='/' + scrFile)
-            a.buttonInscription(href='/modifLogin', alt='Modifier votre profil')                    
-              input#logIn.spriteSubmit.sprite-modifier(type='image', value='')
-      .col-lg-4.col-md-4.col-sm-4.col-xs-12.divPost
-        .row
-          each postProfil in postAll
-            a(href='/post_its/' + postProfil._id,title= postProfil.titre)
-              .col-lg-12.col-md-12.col-sm-12.col-xs-12.postProfil
-                .row
-                  .col-lg-3.col-md-3.col-sm-3.col-xs-3.divTitlePostProfil
-                    p.titlePostProfil=postProfil.titre     
-                  .col-lg-4.col-md-4.col-sm-4.col-xs-4
-                    img#imgPostProfil(src='/' + postProfil.srcfile)
-                  .col-lg-7.col-md-7.col-sm-7.col-xs-
-                    p.textePostProfil=postProfil.texte
-                    p.labelDatePostProfil Date de création  
-                    p.datePostProfil=postProfil.date                  
+          .col-md-3.static
+            .profile-card
+              img.profile-photo(src='/' + srcfile, alt='user')
+              h5
+                a.text-white(href='#')=pseudo
+              a.text-white(href='#')
+                i.fi-torsos-all-female(style='font-size: 16px;')=friends 
+                  |  amis
+            ul.nav-news-feed
+              li
+                i.icon.fi-page-multiple
+                div
+                  a(href='#')
+                    | Mon flux 
+              li
+                i.icon.fi-torsos-all
+                div
+                  a(href='#')
+                    | Mes amis  
+              li
+                i.icon.fi-comments
+                div
+                  a(href='#')
+                    | Messages   
+              li
+                i.icon.fi-photo
+                div
+                  a(href='#')
+                    | Photos
+            #chat-block
+              div.title
+                |Chat online
+              ul.online-users.list-inline
+                each divImgFriend in scrFileFriend
+                  li
+                    a(href='#')
+                      img.img-responsive.profile-photo(src=divImgFriend.srcfile,title=divImgFriend.pseudo) 
+          .col-md-7
+            .head-profil
+            .row.no-margin
+              .col-md-7.col-sm-7.content-profil
+                ul
+                  li
+                    h3|Genre
+                    p=genre
+                      i.fi-pencil
+                  li
+                    h3|Votre age
+                    p=age
+                      i.fi-pencil
+                  li
+                    h3|Votre prenom
+                    p=prenom
+                      i.fi-pencil
+                  li
+                    h3|Votre nom
+                    p=nom
+                      i.fi-pencil
+                  li
+                    h3|Votre pseudo
+                    p=pseudo
+                      i.fi-pencil
+                  li
+                    h3|Votre mot de passe
+                    p=password
+                      i.fi-pencil
+                  li
+                    h3|Votre e-mail
+                    p=email
+                      i.fi-pencil
+                  li
+                    h3|Votre presentation
+                    p=presentation
+                      i.fi-pencil
+              .col-md-5.col-sm-5.photo-profil.no-padding
+                img.img-responsive(src="/" + srcfile, alt="")  
+      section#footer
+          #containerIndex
+            .row
+              #footer-wrapper
+                .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
+                  a(href='index',alt='Home')
+                    img#logoFooter(src='logo-footer.png')
+                  ul.socialList
+                    li
+                      a(href='#',alt='Facebook')
+                        i.iconSocialFooter.fi-social-facebook
+                    li
+                      a(href='#',alt='Twitter')
+                        i.iconSocialFooter.fi-social-twitter
+                    li
+                      a(href='#',alt='Github')
+                        i.iconSocialFooter.fi-social-github
+                    li
+                      a(href='#',alt='Linkedin')
+                        i.iconSocialFooter.fi-social-linkedin  
+                .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
+                  ul.links-footer
+                    li
+                      a(href='inscription',alt='Inscription')|Inscription
+                    li
+                      a(href='#',alt='À propos')|À propos
+                    li
+                      a(href='#',alt='Mentions Légales')|Mentions légales 
+                .col-lg-4.col-md-4.col-sm-12.col-xs-12
+                  ul.contact-footer.text-center
+                    li
+                      i.icon-contact.fi-mobile
+                      p.phone| 06-18-33-96-13
+                    li
+                      i.icon-contact.fi-mail
+                      p.mail| adrienleteinturier@gmail.com                    
     script(src='https://code.jquery.com/jquery-3.1.1.min.js')
     script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
-    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')    
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
     script(type='text/javascript', src='socket.io.js')
-    script(type='text/javascript', src='socketClient.js')    
-    script(src='valid_form.js')          
-      
-   
+    script(type='text/javascript', src='socketClient.js')
+    script(type='text/javascript', src='jqueryBlog.js')
 
-  
+
+
+       

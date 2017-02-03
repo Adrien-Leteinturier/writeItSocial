@@ -1,8 +1,8 @@
 {
-  "name": "premier_exemple",
-  "version": "1.0.0",
-  "description": "Un premier exemple Express",
-  "main": "index.js",
+  "name": "write it social",
+  "version": "0.1.0",
+  "description": "write it social",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
