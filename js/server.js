@@ -43,13 +43,22 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use('node_modules/socket.io/node_modules/socket.io-client/socket.io/', express.static(__dirname + '/node_modules/socket.io/node_modules/socket.io-client'))
 
+
+app.use(function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+  next();
+});
+
+
 //Node mailer//
 
 var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: "Doublemchacha60$"
+			pass: ""
 					}
 });
 
