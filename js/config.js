@@ -8,7 +8,7 @@ pour construire une application MEAN stack de façon à être modulable et scala
 
 
 module.exports = {
-  'port': process.env.PORT || 3333,
+  'port': process.env.PORT || 8080,
   'database': 'mongodb://localhost:27017/DiwJs04',
   'secret': 'itrybuildthebestappsocialnetwork'
 };

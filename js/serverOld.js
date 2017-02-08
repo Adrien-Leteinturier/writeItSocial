@@ -549,10 +549,6 @@ countLive = countLive + 1;
   });
 
 // search bar ends //
-
-
-
-
   });
 });
 

@@ -20,7 +20,7 @@ html
             #lineDiviser
             #formWrapper
               p.textFormWrapper|Inscrivez-vous dès maintenant et rencontrez des gens formidables 
-              form#login(method='POST',action='connexion')
+              form#login(method='POST',action='/authenticate')
                 input#pseudo(type='text',name='pseudo',placeholder='Pseudo')
                 input#password(type='password',name='password',placeholder='Password')
                 button#submit.button-connexion.btnSubmit|Connexion
@@ -69,7 +69,7 @@ html
                 i.fi-check
               h3.text-white.valueConnect
               p|Personnes connectés       
-    //section#liveFeed
+    section#liveFeed
       #containerIndex
         h1.section-titre|Flux en direct 
         h2.section-sub-titre|Voir ce qui se passe maintenant
@@ -135,4 +135,3 @@ html
     script(type='text/javascript', src='socketClient.js')
     script(type='text/javascript', src='main_js_index.js')
 
-  

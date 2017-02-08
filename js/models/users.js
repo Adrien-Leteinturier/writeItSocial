@@ -13,7 +13,7 @@ var usersSchema = mongoose.Schema({
     prenom : String,
     nom : String,
     pseudo : {type: String, required: true, index: { unique: true }},
-    password : {type: String, required: true, select: false},
+    password : String,
     email : String,
     srcfile : String,
     presentation : String,

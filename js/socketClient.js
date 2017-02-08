@@ -3,7 +3,7 @@
     $(document).ready(function(){
 
 
-    var socket = io('http://localhost:3333');
+    var socket = io.connect();
 
 /*------------------Count reel Time---------------------*/
         socket.on('usersCountLog', function (message) {
