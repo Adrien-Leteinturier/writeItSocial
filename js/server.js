@@ -24,8 +24,7 @@ var io = socketIO(server);
 
 var Post = require('./models/posts.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/posts.js)
 var Users = require('./models/users.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
-
-
+ 
 
 // Main Color debug //  
 colors.setTheme({
@@ -87,7 +86,7 @@ db.once('open', function() {
 
       });
   //Compteur number log
-        Users.count(function(err,result){
+        Users.find({}).count(function(err,result){
           if(err){
             console.log('error find Users for count error')
 
@@ -96,7 +95,7 @@ db.once('open', function() {
           }
         });
   //Compteur post
-        Post.count(function(err,result){
+        Post.find({}).count(function(err,result){
           if(err){
             console.log('error find PostIts for count error')
 
@@ -109,18 +108,20 @@ db.once('open', function() {
 
   // all post affichage // 
 
-      Post.find({}).sort({date : -1}).toArray(function(err, data) {
-        io.emit('allPostDisplay',data);
+      Post.find({}).sort([['date', 1]]).exec(function(err, docs) {
+        io.emit('allPostDisplay',docs);
       });
 
+
   // all post affichage ends // 
+
 
 
   // search bar // 
 
     socket.on( 'searchBar', function ( search ) { // quand je recoi des infos en socket , a chaque fois que quelqun tape une nouvelle lettre dans la bar de recherche du header
       console.log('valeur de search bar ' + search);
-      Users.find( { pseudo: { $regex: '^'+search, $options: 'i' } } ).sort( { pseudo: 1 } ).toArray( function ( err, data ) { // je cherche tous les pseudo qui contien c lettre et je les tries
+      Users.find( { pseudo: { $regex: '^'+search, $options: 'i' } } ).sort( { pseudo: 1 } ).exec( function ( err, data ) { // je cherche tous les pseudo qui contien c lettre et je les tries
         if ( err ) {
           console.log('error search');
         } else {

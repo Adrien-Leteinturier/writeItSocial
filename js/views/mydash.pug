@@ -53,7 +53,7 @@ html
               li
                 i.icon.fi-page-multiple
                 div
-                  a(href='#')
+                  a(href='mydash')
                     | Mon flux 
               li
                 i.icon.fi-torsos-all
@@ -95,7 +95,7 @@ html
                     button.btn.btn-primary.pull-right.button-submit-post(type='submit')
                       |Publish
             .div
-              each userAllData in allData
+              each userAllData in allPostUser
                 .post-content
                   img#post-image(src=userAllData.srcfile)
                   .post-container
@@ -119,4 +119,4 @@ html
     script(type='text/javascript', src='jqueryBlog.js')
 
 
-       
+      

@@ -51,11 +51,6 @@ module.exports = function(app, express) {
     })
   });  
 
-  apiRoutes.get('/users', function(req, res) {
-    Users.find({}, function(err, users) {
-      res.json(users);
-    });
-   }); 
 
     apiRoutes.route('/inscription')
     .get(function(req,res){
@@ -166,13 +161,14 @@ apiRoutes.route('/dash')
           userFriend:user.friends,  
           pseudo:user.pseudo,
           srcfile:user.srcfile,
-          friends: user.friends.length,
-          scrFileFriend:user.friends
+          friends: user.friends.length
           });
        }
     });
   })
   .post(upload.single('recfile'),function(req,res){
+    var date = new Date();
+    var datePost = date.toLocaleString(); 
     var tmp_path = req.file.path
     var target_path = 'uploads/' + req.file.originalname;
     var src = fs.createReadStream(tmp_path);
@@ -187,7 +183,7 @@ apiRoutes.route('/dash')
        var posts = new Post();
        posts.texte = req.body.corpsArticle;
        posts.auteur = user.pseudo;
-       posts.date = "";
+       posts.date = datePost;
        posts.srcfile = target_path;
        posts.srcPhotoUser = user.srcfile;
        posts.save(function(err){
@@ -200,6 +196,37 @@ apiRoutes.route('/dash')
      }
    });
   })
+
+apiRoutes.route('/mydash')
+  .get(function(req, res){
+  var queryUser = Users.findOne({pseudo: req.session.pseudo});
+  var queryPost = Post.findOne({pseudo: req.session.pseudo});
+  queryUser.select('pseudo srcfile friends');
+  queryPost.select('texte auteur srcfile srcPhotoUser date ')
+  queryUser.exec(function(err, user) {
+    if(err){
+      throw err
+    } else {
+      queryPost.exec(function(err, post){
+        console.log('postdash' + post)
+        if(err) {
+          res.send(err)
+        } else {
+          res.render('mydash',{
+            userFriend:user.friends,  
+            pseudo:user.pseudo,
+            srcfile:user.srcfile,
+            friends: user.friends.length,
+            scrFileFriend:user.friends,
+            allPostUser:post
+          });
+        }
+      });  
+    }
+  });
+  })
+
+
 return apiRoutes;
 };
 

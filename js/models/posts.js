@@ -9,7 +9,7 @@ var mongoose = require('mongoose');
 var postSchema = mongoose.Schema({
     texte : String,
     auteur : String,
-    date : { type: Date, default: Date.now },
+    date : String,
     srcfile : String,
     urlPhoto : String,
     srcPhotoUser : String

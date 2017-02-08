@@ -50,6 +50,21 @@
 /*------------------List all Post ends---------------------*/
 
 
+/*------------------List user Post---------------------*/
+
+   socket.on('allPostDisplay',function(data){
+
+        $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
+        
+        $('#parentDiv').empty();
+        for(var i = 0; i<data.length; i++){
+                let html = ('<div class="parent-div-post-content"><div class="post-content"><img src='+ '"'+ data[i].srcfile + '"' +'alt="post-image" id="post-image"><div class="post-container"><img src='+'"'+ data[i].srcPhotoUser +'"'+'alt="user" class="profile-photo-md pull-left" id="post-author-image"><div class="post-detail"><div class="user-info"><h5><a href="timeline.html" class="profile-link" id="name-user-post">'+ data[i].auteur +'</a><p id="date-post">'+ data[i].date +'</p></div><div class="reaction"></div><div class="line-divider"></div><div id="post-text"><p>'+ data[i].texte +'</p></div></div></div></div></div>')
+                $('#parentDiv').append(html);
+        }
+    });
+/*------------------List user Post ends---------------------*/
+
+
 /*------------------Search bar-------------------------*/
         $('.form-search-bar').submit(function(e){
             e.preventDefault();

@@ -453,7 +453,7 @@ ul.compteurLive-list > li:nth-child(2),ul.compteurLive-list > li:nth-child(3) {
 {
     text-align: left;
     margin-bottom: 22px;
-    padding: 0 12px;
+    padding: 0 16px;
     position: relative;
 }
 
