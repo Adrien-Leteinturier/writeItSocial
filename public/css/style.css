@@ -1078,11 +1078,20 @@ i.fi-trash
 {
     font-size: 3em;
 }
-.delete a:hover
+.delete-and-modify a:hover
 {
     color: darkslategray;
 }
+.delete-and-modify
+{
+    float: right;
+}
 
+i.modify 
+{
+    font-size: 2.6em;
+    cursor: pointer;
+}
 /*---Display Post Ends--------*/
 
 

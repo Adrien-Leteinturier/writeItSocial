@@ -55,7 +55,7 @@ app.use('/node_modules/socket.io/node_modules/socket.io-client/socket.io/', expr
 
 
 // set up the RESTful API, handler methods are defined in api.js
-var apiRoutes = require('./routes/api.js')(app, express);
+var apiRoutes = require('./routes/api.js')(app, express, mongoose);
 app.use('/', apiRoutes);
 
 

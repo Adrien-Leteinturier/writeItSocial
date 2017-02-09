@@ -23,7 +23,7 @@ var mySecret = config.secret; /* variable qui fait appel  */
 
 //Gestion des Users//
 
-module.exports = function(app, express) {
+module.exports = function(app, express, mongoose) {
 
   
 
@@ -199,19 +199,15 @@ apiRoutes.route('/dash')
 
 apiRoutes.route('/mydash')
   .get(function(req, res){
-  var queryUser = Users.findOne({pseudo: req.session.pseudo});
-  var queryPost = Post.findOne({pseudo: req.session.pseudo});
-  queryUser.select('pseudo srcfile friends');
-  queryPost.select('texte auteur srcfile srcPhotoUser date ')
-  queryUser.exec(function(err, user) {
+  Users.findOne({pseudo: req.session.pseudo},function(err,user){
     if(err){
       throw err
     } else {
-      queryPost.exec(function(err, post){
-        console.log('postdash' + post)
+      Post.find({auteur: user.pseudo},function(err,post){
         if(err) {
           res.send(err)
         } else {
+        console.log('postdash' + post._id)
           res.render('mydash',{
             userFriend:user.friends,  
             pseudo:user.pseudo,
@@ -224,8 +220,114 @@ apiRoutes.route('/mydash')
       });  
     }
   });
+})
+
+apiRoutes.route('/post/:_id')
+  .get(function(req,res){
+    Post.findById(req.params._id, function(err,post) {
+      if(err) {
+        throw err;
+      } else {
+        post.remove({});
+        res.redirect('/mydash');
+      }
+    })
+  })
+  .post(upload.single('recfile'),function(req,res){
+    Post.findById(req.params._id, function(err,posts){
+      if(err){
+        throw err;
+      } else {
+       var date = new Date();
+       var datePost = date.toLocaleString(); 
+       var tmp_path = req.file.path
+       var target_path = 'uploads/' + req.file.originalname;
+       var src = fs.createReadStream(tmp_path);
+       var dest = fs.createWriteStream(target_path);        
+       posts.texte = req.body.corpsArticle;
+       posts.auteur = req.session.pseudo;
+       posts.srcfile = target_path;
+       posts.date = datePost;
+       posts.save(function(err) {
+        if(err) {
+          throw err;
+        } else {
+          res.redirect('/mydash');
+        }
+      })//user.save       
+     }
+    })
   })
 
+  apiRoutes.route('/profil')
+    .get(function(req,res){
+      Users.findOne({pseudo: req.session.pseudo},function(err,user){
+        if(err){
+          throw err;
+        } else {
+          res.render('profil',{
+            genre:user.genre,
+            age:user.age,
+            prenom:user.prenom, 
+            nom:user.nom, 
+            pseudo:req.session.pseudo, 
+            password:user.password, 
+            email:user.email,
+            presentation: user.presentation, 
+            srcfile: user.srcfile,
+            friends: user.friends.length,
+            scrFileFriend:user.friends,
+            postAll: user
+          });          
+        }
+      });      
+    })
+
+/*
+  app.get('/profil',function(req,res){
+  var pseudo = req.session.pseudo;
+  if(req.session.pseudo){
+    collectionPost_its.find({auteur:pseudo}).sort({date : -1}).toArray(function(err, data) {
+      collectionUsers.find({pseudo:pseudo},{
+       
+        _id:1,
+        genre:1,
+        age:1,
+        prenom:1,
+        nom:1,
+        pseudo:1,
+        password:1,
+        email:1,
+        srcfile:1,
+        presentation:1,
+        friends:1
+
+      }).toArray(function(err, result) {
+        console.log(result[0].srcfile)
+
+        res.render('profil',{
+          genre:result[0].genre,
+          age:result[0].age,
+          prenom:result[0].prenom, 
+          nom:result[0].nom, 
+          pseudo:pseudo, 
+          password:result[0].password, 
+          email:result[0].email,
+          presentation: result[0].presentation, 
+          srcfile: result[0].srcfile,
+          friends: result[0].friends.length,
+          scrFileFriend:result[0].friends,
+          postAll: data
+          });
+      });
+    });
+
+        } else {
+          var pseudo = '';
+          res.redirect('/');
+        }
+});
+*/
 
 return apiRoutes;
 };

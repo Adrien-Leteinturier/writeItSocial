@@ -25,19 +25,21 @@ html
           #bs-example-navbar-collapse-1.navbar-collapse.collapse
             ul.nav.navbar-nav.navbar-right.main-menu
               li.dropdown
-                a(href='#')|Home
+                a(href='dash')|Home
               li.dropdown
                 a(href='#')|À propos
               li.dropdown
-                a(href='#')|Profil
+                a(href='profil')|Profil
               li.dropdown
                 a(href='#')|Chat
               li.dropdown
                 a(href='#')|Mentions légales
-            form.navbar-form.navbar-right.hidden-sm
+            form.navbar-form.navbar-right.hidden-sm.form-search-bar
               .form-group
                 i.icon.fi-magnifying-glass
-                input.form-control(type='text',name='search',placeholder='Recherche des amis') 
+                input.form-control.search-bar(type='text',name='search',placeholder='Recherche des amis') 
+          .row.text-center
+            #resultSearch      
     .page-dashboard
       .container
         .row
@@ -58,7 +60,7 @@ html
               li
                 i.icon.fi-torsos-all
                 div
-                  a(href='#')
+                  a(href='profil')
                     | Mes amis  
               li
                 i.icon.fi-comments
@@ -82,7 +84,7 @@ html
             .create-post
               .row
                 .col-md-7.col-sm-7
-                  form.form-group.form-create-post(method='POST',action='/creation',enctype='multipart/form-data')
+                  form.form-group.form-create-post(method='POST',action='/dash',enctype='multipart/form-data')
                     img.profile-photo-md(src='/' + srcfile,alt='profile photo md')
                     textarea#create-post-textarea.form-control(name='corpsArticle',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
                     ul.publishing-tools.list-inline
@@ -101,16 +103,29 @@ html
                   .post-container
                     img#post-author-image.profile-photo-md.pull-left(src=userAllData.srcPhotoUser)
                     .post-detail
+                      .delete-and-modify
+                        a(href="/post/" + userAllData._id,alt='delete post',title='Supprimer')
+                          i.fi-trash
+                        a(alt='delete post',title='Modifier')
+                          i.fi-pencil.modify  
                       .user-info
                         h5
                           a#name-user-post.profile-link(href='timeline.html')=userAllData.auteur
                           p#date-post=userAllData.date
-                        .delete
-                          a(href='/delete',alt='delete post',title='Supprimer')
-                            i.fi-trash
+                          p=message  
                       .line-divider
                       #post-text
-                        p=userAllData.texte                                        
+                        p=userAllData.texte  
+                    form.form-group.post-modify-post(method='POST',action='/post/' + userAllData._id ,enctype='multipart/form-data')
+                      textarea#create-post-textarea.form-control(name='corpsArticle',cols='30',rows='1',placeholder='Modifié votre post')
+                      ul.publishing-tools.list-inline
+                        li
+                          .fileUpload
+                            span.fi-photo
+                            input.upload(type='file',name='recfile',multiple accept='image/*')
+                          .tools
+                            button.btn.btn-primary.pull-right.button-modify-post(type='submit')
+                              |Modifié                                                    
     script(src='https://code.jquery.com/jquery-3.1.1.min.js')
     script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   

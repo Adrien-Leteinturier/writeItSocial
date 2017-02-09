@@ -117,9 +117,17 @@ $( '.button-submit-post' ).click(function() {
 }); 
 // EVENT SUBMIT BUTTON FORM POST ENDS //
 
+// CLICK ICON MODIFY POST //
+$('.post-modify-post').hide();
+$('.modify').click(function(){
+    $('.post-modify-post').show('slow');
+})
+// CLICK ICON MODIFY POST ENDS //
 
-
-
-
+// EVENT SUBMIT BUTTON MODIFY FORM POST //
+$( '.button-modify-post' ).click(function() {
+  $( '.post-modify-post' ).submit();
+}); 
+// EVENT SUBMIT BUTTON MODIFY FORM POST ENDS //
 });
 
