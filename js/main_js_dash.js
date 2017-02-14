@@ -11,14 +11,15 @@ var fixedElement = function(elementTop,element){
 
 	var scrollTop = $(window).scrollTop();
 	var windowHeight = $(window).height();
+    console.log(scrollTop)
 
 	if (scrollTop + 100 > elementTop) {
         console.log('yep')
         $(element).addClass('is_stuck');
 	} 
-    if (scrollTop - 100 < elementTop){
+    if (scrollTop < windowHeight){
         console.log('yep stop')
-        $(element).addClass("#");
+        $(element).removeClass('is_stuck');
     }
     });
 };

@@ -4,6 +4,7 @@
    * list - Returns a list of threads
    * show - Displays a thread and its posts
 */
+
 var session = require('express-session');
 var express = require('express');
 var multer  = require('multer');
@@ -13,35 +14,32 @@ var bodyParser  = require('body-parser');
 var expressJWT = require('express-jwt'); 
 var jwt = require('jsonwebtoken'); //On va faire appel au module jsonwebtoken pour creer , inscrire , verifié nos tokens
 var morgan  = require('morgan');
+var mailer = require('nodemailer');
 var config = require('../config'); //On va faire appel à nos configuration présentent dans le fichier config.js
 var Post = require('../models/posts.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/posts.js)
 var Users = require('../models/users.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
 var mySecret = config.secret; /* variable qui fait appel  */
 
-
+var smtpTransport = mailer.createTransport("SMTP",{
+  service: "Gmail",
+	  auth: {
+		  user: "adrienleteinturier@gmail.com",
+			pass: "doublem93600$"
+					}
+});
 
 
 //Gestion des Users//
 
-module.exports = function(app, express, mongoose) {
-
+module.exports = function(app, express) {
+  var apiRoutes = express.Router();
   
-
-
-
   app.use(session({
     secret:'%$µ1&&||#',
     saveUninitialized : false,
     resave: false
   }))
-  var apiRoutes = express.Router();
-
-
   apiRoutes.get('/', function(req, res) {
-   res.redirect('/index');
-  });
-
-  apiRoutes.get('/index', function(req, res) {
     Post.find({},function(err,posts){
       var data1 = posts.slice (0, 5);
       var data2 = posts.slice (5, 10);
@@ -50,6 +48,37 @@ module.exports = function(app, express, mongoose) {
         feedLiveArray2:data2});
     })
   });  
+
+
+  apiRoutes.route('/mdpLost')
+    .get(function(req,res){
+      res.render('mdpLost');
+    })
+    .post(function(req,res){
+      Users.findOne({email:req.body.email},function(err,user){
+        if(err){
+          throw err;
+          res.render('mdpLost',{message:'Votre profil est inconnu'});
+        } else {
+          var mailMdpLost = {
+            from: "WriteItSocial@gmail.com",
+              to: user.email,
+                subject: "Votre mot de passe",
+                html: "<div><div style='background-color:#333856;color:white;text-align:center;padding:16px;'><h1>Bonjour " + user.pseudo + "</h1><br><h4>Suite à votre demande de mot de passe oublié</h4><p>Voici votre mot de passe : </p><h4>" + user.password + "</h4></div>"
+          }
+          smtpTransport.sendMail(mailMdpLost, function(error, response){
+            if(error){
+              console.log("Erreur lors de l'envoie du mail!".error);
+              console.log(error.error);
+            } else {
+              console.log("Mail envoyé avec succès!".info)
+            }
+            smtpTransport.close();
+          });   
+          res.redirect('/');                  
+        }
+      })
+    })
 
 
     apiRoutes.route('/inscription')
@@ -78,16 +107,21 @@ module.exports = function(app, express, mongoose) {
           srcfile:null
         }]
       users.save(function(err){
-        if(err)throw err;
-        var usersPseudo = Users.findOne({pseudo:req.body.pseudo})
-        if(usersPseudo) { //Nous permet de vérifier si un utilisateur existe déjà
-            res.render('inscription',{message: 'Un utilisateur avec ce nom d\'utilisateur existe déjà.'});
+        if(err) {
+          if(err.code == 11000) { //Nous permet de vérifier si un utilisateur existe déjà
+            return res.render('inscription' ,{success: false, message: 'Un utilisateur avec ce pseudo d\'utilisateur existe déjà.'});
+          } else {
+            return res.send(err);
+          }
         } else {
-          res.redirect('/dash');
+          res.redirect('/');
         }
       })
     })
 
+
+
+    
   apiRoutes.post('/authenticate', function(req, res) {
     var query = Users.findOne({pseudo: req.body.pseudo});
     query.select('prenom nom pseudo password');
@@ -119,8 +153,6 @@ module.exports = function(app, express, mongoose) {
       }
     });
   });
-
-
 apiRoutes.use(function(req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.session.token;
@@ -181,7 +213,7 @@ apiRoutes.route('/dash')
       res.send(err);
      } else {
        var posts = new Post();
-       posts.texte = req.body.corpsArticle;
+       posts.texte = req.body.textPost;
        posts.auteur = user.pseudo;
        posts.date = datePost;
        posts.srcfile = target_path;
@@ -190,12 +222,18 @@ apiRoutes.route('/dash')
         if(err){
         throw err;
         } else {
-          res.redirect('/dash');
         }
       })
      }
    });
   })
+
+
+
+
+
+
+  
 
 apiRoutes.route('/mydash')
   .get(function(req, res){
@@ -244,7 +282,7 @@ apiRoutes.route('/post/:_id')
        var target_path = 'uploads/' + req.file.originalname;
        var src = fs.createReadStream(tmp_path);
        var dest = fs.createWriteStream(target_path);        
-       posts.texte = req.body.corpsArticle;
+       posts.texte = req.body.textPost;
        posts.auteur = req.session.pseudo;
        posts.srcfile = target_path;
        posts.date = datePost;
@@ -258,6 +296,57 @@ apiRoutes.route('/post/:_id')
      }
     })
   })
+//////ddfdfd///////
+apiRoutes.route('/comments/:_id')
+  .post(function(req,res){
+    Users.findOne({pseudo:req.session.pseudo},function(err,user){
+      if(err){
+        throw err;
+      } else {
+        var date = new Date();
+        var datePost = date.toLocaleString();
+        console.log(req.params._id);
+        Post.findByIdAndUpdate(
+        req.params._id,
+        {$push: {comments: {
+          auteur : req.session.pseudo,
+          texte : req.body.textComment,
+          date : datePost,
+          srcPhotoUser : user.srcfile
+        }}},
+        {safe: true, upsert: true, new : true},
+        function(err, model) {
+          if(err){
+          console.log(err);
+          }
+        }
+        );   
+        res.redirect('/dash'); 
+      }
+    }) 
+  })
+  
+  /*
+apiRoutes.route('/comments/:_id')
+  .post(function(req,res){
+    Users.findOne({pseudo:req.session.pseudo},function(err,user){
+          var date = new Date();
+          var datePost = date.toLocaleString();
+          Post.findByIdAndUpdate(
+          req.params._id,
+          {$push: {comments: [{
+            auteur : req.session.pseudo,
+            texte : req.body.textComment,
+            date : datePost,
+            srcPhotoUser : user.srcfile
+          }]}},
+          {safe: true, upsert: true, new : true},
+          function(err, model) {
+              console.log(err);
+          }
+          );    
+    }) 
+  })*/
 
   apiRoutes.route('/profil')
     .get(function(req,res){
@@ -282,6 +371,49 @@ apiRoutes.route('/post/:_id')
         }
       });      
     })
+    .post(function(req,res){
+      Users.findOne({pseudo: req.session.pseudo}, function(err,user){
+        if(err){
+          throw err;
+        } else {
+          user.age = req.body.age;
+          user.prenom = req.body.prenom;
+          user.nom = req.body.nom;
+          user.pseudo = req.body.pseudo;
+          user.password = req.body.password;
+          user.email = req.body.email;
+          //user.srcfile = target_path;
+          user.presentation = req.body.present;
+          user.save(function(err) {
+            if(err) {
+              throw err;
+            } else {
+              res.redirect('/profil');
+            }
+          })//user.save       
+        }
+      })
+    })
+
+  apiRoutes.route('/deleteProfil/:_id')
+    .get(function(req,res){
+      Users.findById(req.params._id, function(err,user) {
+        if(err) {
+          throw err;
+        } else {
+          user.remove({});
+          res.redirect('/');
+        }
+      })
+    })
+
+
+
+
+
+
+
+
 
 /*
   app.get('/profil',function(req,res){

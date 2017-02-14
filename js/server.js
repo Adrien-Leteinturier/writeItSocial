@@ -55,7 +55,7 @@ app.use('/node_modules/socket.io/node_modules/socket.io-client/socket.io/', expr
 
 
 // set up the RESTful API, handler methods are defined in api.js
-var apiRoutes = require('./routes/api.js')(app, express, mongoose);
+var apiRoutes = require('./routes/api.js')(app, express,mongoose);
 app.use('/', apiRoutes);
 
 
@@ -108,7 +108,7 @@ db.once('open', function() {
 
   // all post affichage // 
 
-      Post.find({}).sort([['date', 1]]).exec(function(err, docs) {
+      Post.find({}).sort([['date', -1]]).exec(function(err, docs) {
         io.emit('allPostDisplay',docs);
       });
 
@@ -132,7 +132,7 @@ db.once('open', function() {
     });
   // search bar ends //
   });
-});
+});// Mongoose end connect // 
 
 
 

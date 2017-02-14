@@ -12,6 +12,15 @@ var postSchema = mongoose.Schema({
     date : String,
     srcfile : String,
     urlPhoto : String,
-    srcPhotoUser : String
+    srcPhotoUser : String,
+    comments: [
+        {
+            auteur: String,
+            texte: String,
+            date: String,
+            srcPhotoUser : String,
+
+        }
+    ]
 });
 module.exports = mongoose.model('Post', postSchema);

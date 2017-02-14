@@ -22,12 +22,13 @@ html
             #lineDiviser
             #formWrapper
               p.textFormWrapper|Vous avez oublié votre mot de passe ? Entrer votre mail , il vous sera envoyé !
-              form#postMdpLost(method='POST',action='mdpRecup')
+              form#postMdpLost(method='POST',action='mdpLost')
                 input#email(type='email',name='email',placeholder='Votre e-mail')
                 button#submit.button-connexion.btnSubmit|Envois
             a.linkInscription(href='inscription', alt='Inscription')|Inscription?
             a.linkInscription(href='mdpLost',alt='Mot de passe oublier')|Mot de passe oublier?
             img.formShadow(src='bottom-shadow.png')
+          p=message    
     section#footer
       #containerIndex
         .row

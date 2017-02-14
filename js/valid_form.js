@@ -1,6 +1,17 @@
 $(document).ready(function(){
 // VALIDATION FORMULAIRE INSCRIPTION//   // VALIDATION FORMULAIRE CREATION POST IT //
-    var dialogs = ['#dialogAge','#dialogFirstName','#dialogLastName','#dialogPs','#dialogMdpEmpty','#dialogMdpMinLength','#dialogMail','#dialogProfil','#dialogTitlePostIt','#dialogCorpsPostIt','#dialogPhotoArt','#dialogTitlePostItLength'];
+    var dialogs = [
+        '#dialogAge',
+        '#dialogFirstName',
+        '#dialogLastName',
+        '#dialogPs',
+        '#dialogMdpEmpty',
+        '#dialogMdpMinLength',
+        '#dialogMail',
+        '#dialogProfil',
+        '#dialogCorpsPostIt',
+        '#dialogPhotoArt'
+        ];
     $( function() {
         for(var i = 0; i < dialogs.length; i++){
             $(dialogs[i]).dialog({
@@ -68,44 +79,26 @@ $(document).ready(function(){
         }
 
     });
-    
- /*   $( '#creaArticle' ).submit(function(event) {
-        if($('#titre').val() === ''){
-            event.preventDefault();
-            $( '.dialogTitle' ).dialog( 'open' );
-            $('.dialogTitle, body').click(function(){
-                $('.dialogTitle').dialog('close');
-            })
-        }
-      /*  else if($('#titre').val().length > 10 ){
-            event.preventDefault();
-            $( '.dialogTitleLength' ).dialog( 'open' );
-            $('.dialogTitleLength, body').click(function(){
-                $('.dialogTitleLength').dialog('close');
-            })
-        }
-        else if($('#corpsArticle').val() === ''){
-            event.preventDefault();
-            $( '.dialogArea' ).dialog( 'open' );
-            $('.dialogArea, body').click(function(){
-                $('.dialogArea').dialog('close');
-            })
-        }
-        else if($('#photoArticle').val() === '' && $('#lienPhotoPost').val() === ''){
-            event.preventDefault();
-            $( '.dialogPicArt' ).dialog( 'open' );
-            $('.dialogPicArt, body').click(function(){
-                $('.dialogPicArt').dialog('close');
-            })
-        }
-        if($('#lienPhotoPost').val()){
-            $('#photoArticle').val() = 'ok';
-            alert('val ok')
-        }
-        if($('#photoArticle').val()){
-            $('#lienPhotoPost').disabled = true;
-        }
+            
+        $( '#form-create-post' ).submit(function(event) {
+            if($('#create-post-textarea').val() === ''){
+                event.preventDefault();
+                $( '.dialogArea' ).dialog( 'open' );
+                $('.dialogArea, body').click(function(){
+                    $('.dialogArea').dialog('close');
+                })
+            }
+            else if($('.fileUpload input.upload').val() === ''){
+                console.log('empty')
+                event.preventDefault();
+                console.log('prevent')
+                $( '.dialogPicArt' ).dialog( 'open' );
+                console.log('open')
+                $('.dialogPicArt, body').click(function(){
+                    $('.dialogPicArt').dialog('close');
+                })
+            }
+        });
+            
     });
-    */
-  });
 });

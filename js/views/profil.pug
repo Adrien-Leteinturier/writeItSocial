@@ -84,39 +84,34 @@ html
             .head-profil
             .row.no-margin
               .col-md-7.col-sm-7.content-profil
-                ul
-                  li
-                    h3|Genre
-                    p=genre
-                      i.fi-pencil
-                  li
-                    h3|Votre age
-                    p=age
-                      i.fi-pencil
-                  li
-                    h3|Votre prenom
-                    p=prenom
-                      i.fi-pencil
-                  li
-                    h3|Votre nom
-                    p=nom
-                      i.fi-pencil
-                  li
-                    h3|Votre pseudo
-                    p=pseudo
-                      i.fi-pencil
-                  li
-                    h3|Votre mot de passe
-                    p=password
-                      i.fi-pencil
-                  li
-                    h3|Votre e-mail
-                    p=email
-                      i.fi-pencil
-                  li
-                    h3|Votre presentation
-                    p=presentation
-                      i.fi-pencil
+                form#formModifyProfil(method='POST',action='/profil')
+                  ul
+                    li
+                      h3|Votre age
+                      input#age(type='text',name='age', maxlength='2', value=age)
+                    li
+                      h3|Votre prenom
+                      input#prenom(type='text',name='prenom',value=prenom)
+                    li
+                      h3|Votre nom
+                      input#nom(type='text',name='nom',value=nom)
+                    li
+                      h3|Votre pseudo
+                      input#pseudo(type='text',name='pseudo',value=pseudo)
+                    li
+                      h3|Votre mot de passe
+                      input#password(type='password',name='password', value=password)
+                    li
+                      h3|Votre e-mail
+                      input#email(type='email',name='email',value=email)
+                    li
+                      h3|Votre presentation
+                      textarea#presentation(name='present', maxlenght='140',placeholder=presentation)
+                  button.btn.btn-primary.button-modify-post(type='submit')
+                    |Modifier
+                  a.btn.btn-primary.pull-right.button-delete-user(href="/deleteProfil/" + postAll._id,alt='delete post',title='Supprimer')
+                    |Supprimer 
+                  p|Avertissement : Si vous decidez de supprimer ou de modifier votre profil, cette action sera definitive.         
               .col-md-5.col-sm-5.photo-profil.no-padding
                 img.img-responsive(src="/" + srcfile, alt="")  
       section#footer
@@ -141,8 +136,6 @@ html
                         i.iconSocialFooter.fi-social-linkedin  
                 .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
                   ul.links-footer
-                    li
-                      a(href='inscription',alt='Inscription')|Inscription
                     li
                       a(href='#',alt='À propos')|À propos
                     li

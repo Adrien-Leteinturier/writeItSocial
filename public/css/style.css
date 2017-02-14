@@ -486,6 +486,8 @@ img.profil-photo-live
 .text-date
 {
     color: #939598;
+    margin-left: 47px;
+    margin-top: -10px;
 }
 .live-activ
 {
@@ -1055,7 +1057,9 @@ img.profile-photo-sm
 {
     margin-right: 10px;
 }
-
+#post-text p{
+    word-break: break-all;
+}
 .line-divider 
 {
     background: none;
@@ -1092,8 +1096,23 @@ i.modify
     font-size: 2.6em;
     cursor: pointer;
 }
-/*---Display Post Ends--------*/
+.post-comment
+{
+    margin-top: 50px;
+}
 
+#comment
+{
+    display: inline-flex;
+    margin: 10px auto;
+    width: 100%;
+}
+.auteurAndTexteComment
+{
+    margin-top: 12px;
+}
+/*---Display Post Ends--------*/
+    
 
 /*---Result search bar--------*/
 
@@ -1127,6 +1146,7 @@ i.modify
 .content-profil
 {
     background-color: #f8f8f8;
+    padding-bottom: 20px;
 }
 .content-profil h3 
 {
@@ -1156,6 +1176,20 @@ i.modify
     padding-left: 0;
     padding-right: 0;
 }
+
+
+/******************************************************************
+
+
+
+
+
+
+
+
+
+
+
 
 /*--------------------------HEAD----------------------------*/
 
@@ -1266,11 +1300,6 @@ i.modify
 }
 
 /*--------------------------HEAD----------------------------*/
-
-
-
-
-
 
 /*--------------------------Articles----------------------------*/
 
@@ -1485,7 +1514,7 @@ i.fi-page-edit:hover,i.fi-page-delete:hover
 
 }
 
-#titre,#email,#corpsArticle,#lienPhotoPost
+#titre,#email,#textPost,#lienPhotoPost
 {
     border-radius:5px;
     width: 200px;
@@ -1496,7 +1525,7 @@ i.fi-page-edit:hover,i.fi-page-delete:hover
     color: black;
     outline: none;
 }
-#corpsArticle
+#textPost
 {
     height: 100px;
 }

@@ -86,7 +86,7 @@ html
                 .col-md-7.col-sm-7
                   form.form-group.form-create-post(method='POST',action='/dash',enctype='multipart/form-data')
                     img.profile-photo-md(src='/' + srcfile,alt='profile photo md')
-                    textarea#create-post-textarea.form-control(name='corpsArticle',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
+                    textarea#create-post-textarea.form-control(name='textPost',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
                     ul.publishing-tools.list-inline
                       li
                         .fileUpload
@@ -117,7 +117,7 @@ html
                       #post-text
                         p=userAllData.texte  
                     form.form-group.post-modify-post(method='POST',action='/post/' + userAllData._id ,enctype='multipart/form-data')
-                      textarea#create-post-textarea.form-control(name='corpsArticle',cols='30',rows='1',placeholder='Modifié votre post')
+                      textarea#create-post-textarea.form-control(name='textPost',cols='30',rows='1',placeholder='Modifié votre post')
                       ul.publishing-tools.list-inline
                         li
                           .fileUpload
