@@ -4,6 +4,7 @@
   "description": "build social network nodejs app ",
   "main": "server.js",
   "dependencies": {
+    "bluebird": "^3.4.7",
     "body-parser": "^1.15.2",
     "colors": "^1.1.2",
     "cookie-parser": "^1.4.3",

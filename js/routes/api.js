@@ -6,7 +6,6 @@
 */
 
 var session = require('express-session');
-var express = require('express');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/'});
 var fs = require('fs'); /* Appel du module  */
@@ -20,18 +19,20 @@ var Post = require('../models/posts.js'); //On va mainteant importer notre modè
 var Users = require('../models/users.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
 var mySecret = config.secret; /* variable qui fait appel  */
 
+
+
 var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: "doublem93600$"
+			pass: ""
 					}
 });
 
 
 //Gestion des Users//
 
-module.exports = function(app, express) {
+module.exports = function(app, express, io) {
   var apiRoutes = express.Router();
   
   app.use(session({
@@ -39,6 +40,8 @@ module.exports = function(app, express) {
     saveUninitialized : false,
     resave: false
   }))
+
+
   apiRoutes.get('/', function(req, res) {
     Post.find({},function(err,posts){
       var data1 = posts.slice (0, 5);
@@ -123,10 +126,7 @@ module.exports = function(app, express) {
 
     
   apiRoutes.post('/authenticate', function(req, res) {
-    var query = Users.findOne({pseudo: req.body.pseudo});
-    query.select('prenom nom pseudo password');
-  // find the user
-    query.exec(function(err, user) {
+    Users.findOne({pseudo: req.body.pseudo},function(err,user){
       if (err) throw err;
       if (!user) {
         res.json({ success: false, message: 'Authentication failed. User not found.' });
@@ -182,9 +182,7 @@ apiRoutes.use(function(req, res, next) {
 
 apiRoutes.route('/dash')
   .get(function(req, res){
-  var query = Users.findOne({pseudo: req.session.pseudo});
-  query.select('pseudo srcfile friends');
-  query.exec(function(err, user) {
+  Users.findOne({pseudo: req.session.pseudo},function(err,user){
         if(err) {
           res.send(err);
         }
@@ -201,14 +199,12 @@ apiRoutes.route('/dash')
   .post(upload.single('recfile'),function(req,res){
     var date = new Date();
     var datePost = date.toLocaleString(); 
-    var tmp_path = req.file.path
-    var target_path = 'uploads/' + req.file.originalname;
+    var tmp_path = req.body.image;
+    var target_path = 'uploads/' + req.body.image.originalname;
     var src = fs.createReadStream(tmp_path);
     var dest = fs.createWriteStream(target_path);
     src.pipe(dest);
-    var query = Users.findOne({pseudo:req.session.pseudo});
-    query.select('pseudo srcfile')
-    query.exec(function(err, user) {
+    Users.findOne({pseudo:req.session.pseudo},function(err,user){
      if(err) {
       res.send(err);
      } else {
@@ -222,6 +218,9 @@ apiRoutes.route('/dash')
         if(err){
         throw err;
         } else {
+        Post.find({}).sort([['date', -1]]).exec(function(err, docs) {
+          io.emit('allPostDisplay',docs);
+        });
         }
       })
      }
@@ -229,11 +228,6 @@ apiRoutes.route('/dash')
   })
 
 
-
-
-
-
-  
 
 apiRoutes.route('/mydash')
   .get(function(req, res){
@@ -279,7 +273,8 @@ apiRoutes.route('/post/:_id')
        var date = new Date();
        var datePost = date.toLocaleString(); 
        var tmp_path = req.file.path
-       var target_path = 'uploads/' + req.file.originalname;
+       console.log(tmp_path);
+       var target_path = 'uploads/' + req.body.image;
        var src = fs.createReadStream(tmp_path);
        var dest = fs.createWriteStream(target_path);        
        posts.texte = req.body.textPost;
@@ -395,6 +390,28 @@ apiRoutes.route('/comments/:_id')
       })
     })
 
+  apiRoutes.route('/profilPublic/:_id')
+  .get(function(req,res){
+    Users.findById(req.params._id,function(err,userPublic){
+    if(err){
+      throw err;
+    } else {
+      Users.findOne({pseudo: req.session.pseudo},function(err,user){
+            if(err) {
+              throw err;
+            } else {
+              res.render('profilPublic',{
+              userFriend:user.friends,  
+              pseudo:user.pseudo,
+              srcfile:user.srcfile,
+              friends: user.friends.length
+              });
+          }
+        });
+      }
+    })
+  })
+
   apiRoutes.route('/deleteProfil/:_id')
     .get(function(req,res){
       Users.findById(req.params._id, function(err,user) {
@@ -460,6 +477,68 @@ apiRoutes.route('/comments/:_id')
         }
 });
 */
+
+  // Compteur live Server //
+  var countLive = 0;
+  io.on('connection', function (socket) {
+  countLive = countLive + 1;
+
+  //Compteur connect
+  
+    io.emit('usersLiveCount',countLive)
+      console.log('a user connected');
+
+      socket.on('disconnect', function () {
+        countLive = countLive - 1;
+        io.emit('usersLiveCount',countLive)
+        console.log('user disconnected');
+
+      });
+  //Compteur number log
+        Users.find({}).count(function(err,result){
+          if(err){
+            console.log('error find Users for count error')
+
+          } else if(result){
+            io.emit('usersCountLog', result);
+          }
+        });
+  //Compteur post
+        Post.find({}).count(function(err,result){
+          if(err){
+            console.log('error find PostIts for count error')
+
+          } else if(result){
+            io.emit('postItsCountLog', result);
+          }
+        });
+
+  // Compteur live Server ends //  
+
+  // all post affichage // 
+        Post.find({}).sort([['date', -1]]).exec(function(err, docs) {
+          io.emit('allPostDisplay',docs);
+        });
+  // all post affichage ends // 
+
+
+
+  // search bar // 
+
+    socket.on( 'searchBar', function ( search ) { // quand je recoi des infos en socket , a chaque fois que quelqun tape une nouvelle lettre dans la bar de recherche du header
+      console.log('valeur de search bar ' + search);
+      Users.find( { pseudo: { $regex: '^'+search, $options: 'i' } } ).sort( { pseudo: 1 } ).exec( function ( err, data ) { // je cherche tous les pseudo qui contien c lettre et je les tries
+        if ( err ) {
+          console.log('error search');
+        } else {
+          console.log(data);
+          socket.emit( 'returnSearch', { users : data } )  // je renvoye tous les resultat a l utilisateurs en direct grace socket.io
+        }
+      });
+    });
+  // search bar ends //
+  });
+
 
 return apiRoutes;
 };

@@ -36,10 +36,8 @@
 
 
 /*------------------List all Post---------------------*/
-
-
-
    socket.on('allPostDisplay',function(data){
+       console.log(data);
 
         $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
 
@@ -57,8 +55,6 @@
           //  }
         }
     });
-
-
 /*------------------List all Post ends---------------------*/
 
 
@@ -76,7 +72,7 @@
             console.log(data.users[0]);
             $('#resultSearch').empty();
             for(var i = 0; i<data.users.length;i++){
-                let htmlSearch = ('<div class="col-md-1 result-post"><a href="#" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
+                let htmlSearch = ('<div class="col-md-1 result-post"><a href="/profilPublic/'+ data.users[i]._id +'" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
             $('#resultSearch').append(htmlSearch);
             }
             if($('.search-bar').val() === ''){
@@ -90,16 +86,22 @@
 
 /*------------------Submit event prevent---------------*/
 
-/*$('#form-create-post').submit(function(event) {
+
+/*-----------------AJAX-------------------------------*/
+$('#form-create-post').submit(function(event) {
     event.preventDefault();
+    var data = {
+        'textPost': $('#create-post-textarea').val(),
+        'image': $("input[name='recfile']").val()
+    };
     $.ajax({
-    enctype: 'multipart/form-data',
-    type: 'POST',
-    url: '/dash',
+        type: 'POST',
+        url: '/dash',
+        data: data
     }).done(function(result) {
     })
-});*/
-
+    $('#create-post-textarea').val('')
+});
 
 
     })
