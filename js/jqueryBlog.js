@@ -15,7 +15,7 @@ $(document).ready(function(){
             $(targetElement).show('slow');
         })
     }
-    hideShowForm($('.post-modify-post'),$('.modify'))
+    hideShowForm($('.modify'),$('.post-modify-post'))
 
     // CLICK ICON MODIFY POST ENDS //
 
@@ -24,23 +24,6 @@ $(document).ready(function(){
         $( '.post-modify-post' ).submit();
     }); 
     // EVENT SUBMIT BUTTON MODIFY FORM POST ENDS //
-
-    /////*AJAX METHOD*/////
-    $('.update_hub').submit(function(event) {
-        event.preventDefault();
-        var data = {
-          "Ref_client" : $('#Ref_client').val(),
-          "versionHardware" : $('#versionHardware').val(),
-          "versionSoftware" : $('#versionSoftware').val()
-        };
-        $.ajax({
-          type: 'PUT',
-          url: '/api/hubs/'+idHub,
-          data: data
-        }).done(function(result) {
-          window.location.replace("/redirectUpdate");
-        })
-    });
 
 
 });

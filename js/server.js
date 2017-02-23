@@ -59,7 +59,7 @@ mongoose.connect('mongodb://localhost:27017/DiwJs04');
 
 
 // set up the RESTful API, handler methods are defined in api.js
-var apiRoutes = require('./routes/api.js')(app, express, io);
+var apiRoutes = require('./routes/api.js')(app, express, io, mongoose);
 app.use('/', apiRoutes);
 
 //var db = mongoose.connection;

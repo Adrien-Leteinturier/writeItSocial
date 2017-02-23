@@ -108,4 +108,3 @@ $('#form-create-post').submit(function(event) {
 })(window, io);
 
 
-

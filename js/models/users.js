@@ -21,7 +21,8 @@ var usersSchema = mongoose.Schema({
     friends : [ 
         {
             pseudo : String,
-            srcfile : String
+            srcfile : String,
+            status : String
         }
     ]
 });
