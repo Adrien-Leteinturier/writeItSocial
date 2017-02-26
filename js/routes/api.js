@@ -104,11 +104,6 @@ module.exports = function(app, express, io, mongoose) {
         users.email = req.body.email;
         users.srcfile = target_path;
         users.presentation = req.body.present;
-        users.friends = [
-        {
-          pseudo:null,
-          srcfile:null
-        }]
       users.save(function(err){
         if(err) {
           if(err.code == 11000) { //Nous permet de vérifier si un utilisateur existe déjà
@@ -199,8 +194,8 @@ apiRoutes.route('/dash')
   .post(upload.single('file'),function(req,res){
     var date = new Date();
     var datePost = date.toLocaleString(); 
-    var tmp_path = req.file.path;
-    var target_path = 'uploads/' + req.file.originalname;
+    var tmp_path = req.body.image.path;
+    var target_path = 'uploads/' + req.body.image.name;
     var src = fs.createReadStream(tmp_path);
     var dest = fs.createWriteStream(target_path);
     src.pipe(dest);
@@ -422,26 +417,108 @@ apiRoutes.route('/comments/:_id')
   })
   .post(function(req,res){
     Users.findById(req.params._id,function(err,userPublicInvite){
+      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+        if(err){
+          throw err;
+        } else {
+    if(err){
+      throw err;
+    } else {
           var mailMdpLost = {
             from: "WriteItSocial@gmail.com",
               to: userPublicInvite.email,
                 subject: "Vous avez reçu une invitation de la part de " + " " + req.session.pseudo,
                 html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userPublicInvite.pseudo + "</h2><br><h2>Vous avez reçu une invitation de la part de "+ "<br>" + req.session.pseudo +"</h2><br><a href='http://localhost:8080/validInvite/"+ userPublicInvite._id + "'>Pour accepter l'invitation - Cliquez ICI</a></div>"
-          }
-          smtpTransport.sendMail(mailMdpLost, function(error, response){
-            if(error){
-              console.log("Erreur lors de l'envoie du mail!".error + error);
-              console.log(error.error);
-            } else {
-              console.log("Mail envoyé avec succès!".info)
             }
-            smtpTransport.close();
-          });
-          res.redirect('/dash');         
-    })  
+            smtpTransport.sendMail(mailMdpLost, function(error, response){
+              if(error){
+                console.log("Erreur lors de l'envoie du mail!".error + error);
+                console.log(error.error);
+              } else {
+                console.log("Mail envoyé avec succès!".info)
+              }
+              smtpTransport.close();
+            });
+            addfriends = 
+              {
+                pseudo:userPublicInvite.pseudo,
+                srcfile:userPublicInvite.srcfile,
+                status: 'Invitation en cours...'
+              }
+            
+            Users.findByIdAndUpdate(
+                {_id: user._id},
+                {$push: {friends: addfriends}},
+                {safe: true, upsert: true},
+                function(err, model) {
+                    console.log(err);
+                }
+            );
+            res.redirect('/friends')
+          }
+        }
+      });
+    }); 
   })
 
   apiRoutes.route('/validInvite/:_id')
+    .get(function(req,res){
+      Users.findById(req.params._id,function(err,userPublicInvite){
+        Users.findOne({pseudo:req.session.pseudo},function(err,user){
+          if(err){
+            throw err;
+          } else {
+            addfriends = 
+              {
+                pseudo:userPublicInvite.pseudo,
+                srcfile:userPublicInvite.srcfile,
+                status: 'Amis'
+              }            
+            Users.findOneAndUpdate(
+                {pseudo: req.session.pseudo},
+                {$push: {friends: addfriends}},
+                {safe: false, upsert: false},
+                function(err, model) {
+                    console.log(err);
+                }
+            );
+          var mailMdpLost = {
+            from: "WriteItSocial@gmail.com",
+              to: user.email,
+                subject: userPublicInvite.pseudo + "à confirmé l'invitation " ,
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + user.pseudo + "</h2><br><h2>Vous etes maintenant amis avec"+ "<br>" + userPublicInvite.pseudo +"</h2></div>"
+            }
+            smtpTransport.sendMail(mailMdpLost, function(error, response){
+              if(error){
+                console.log("Erreur lors de l'envoie du mail!".error + error);
+                console.log(error.error);
+              } else {
+                console.log("Mail envoyé avec succès!".info)
+              }
+              smtpTransport.close();
+            });    
+            res.redirect('/index')               
+          }            
+        });
+      });
+    });
+    
+  apiRoutes.route('/friends')
+    .get(function(req, res){
+    Users.findOne({pseudo: req.session.pseudo},function(err,user){
+      if(err){
+        throw err
+      } else {
+        res.render('friends',{
+        userFriend:user.friends,
+        pseudo:user.pseudo,
+        srcfile:user.srcfile,
+        friends: user.friends.length
+        });
+      }
+    });
+  });
+  
 
   apiRoutes.route('/deleteProfil/:_id')
     .get(function(req,res){

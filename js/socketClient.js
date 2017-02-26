@@ -90,10 +90,13 @@
 /*-----------------AJAX-------------------------------*/
 $('#form-create-post').submit(function(event) {
     event.preventDefault();
+    var file =  $('#file')[0].files[0];
     var data = {
         'textPost': $('#create-post-textarea').val(),
-        'image': $("input[name='recfile']").val()
+        'image': file
     };
+    console.log(data)
+
     $.ajax({
         type: 'POST',
         url: '/dash',

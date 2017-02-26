@@ -7,16 +7,6 @@ $(document).ready(function(){
     }); 
     // EVENT SUBMIT BUTTON FORM POST ENDS //
 
-    // CLICK ICON MODIFY POST //
-    
-    var hideShowForm = function(clicElement,targetElement){
-        $(targetElement).hide();
-        $(clicElement).click(function(){
-            $(targetElement).show('slow');
-        })
-    }
-    hideShowForm($('.modify'),$('.post-modify-post'))
-
     // CLICK ICON MODIFY POST ENDS //
 
     // EVENT SUBMIT BUTTON MODIFY FORM POST //

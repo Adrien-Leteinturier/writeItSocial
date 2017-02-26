@@ -11,7 +11,6 @@ var postSchema = mongoose.Schema({
     auteur : String,
     date : String,
     srcfile : String,
-    urlPhoto : String,
     srcPhotoUser : String,
     comments: [
         {
