@@ -25,7 +25,7 @@ var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: "doublem93600$"
+			pass: ""
 					}
 });
 
