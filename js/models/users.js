@@ -24,6 +24,13 @@ var usersSchema = mongoose.Schema({
             srcfile : String,
             status : String
         }
+    ],
+    messages : [
+        {
+            pseudo : String,
+            date : String,
+            texte : String
+        }
     ]
 });
 

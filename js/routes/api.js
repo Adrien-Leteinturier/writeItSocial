@@ -25,7 +25,7 @@ var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: ""
+			pass: "doublem93600$"
 					}
 });
 
@@ -41,6 +41,9 @@ module.exports = function(app, express, io, mongoose) {
     resave: false
   }))
 
+  apiRoutes.get('/index',function(req,res){
+    res.redirect('/');
+  })
 
   apiRoutes.get('/', function(req, res) {
     Post.find({},function(err,posts){
@@ -194,11 +197,11 @@ apiRoutes.route('/dash')
   .post(upload.single('file'),function(req,res){
     var date = new Date();
     var datePost = date.toLocaleString(); 
-    var tmp_path = req.body.image.path;
-    var target_path = 'uploads/' + req.body.image.name;
-    var src = fs.createReadStream(tmp_path);
-    var dest = fs.createWriteStream(target_path);
-    src.pipe(dest);
+   // var tmp_path = req.body.image.path;
+   // var target_path = 'uploads/' + req.body.image.name;
+   // var src = fs.createReadStream(tmp_path);
+   // var dest = fs.createWriteStream(target_path);
+   // src.pipe(dest);
     Users.findOne({pseudo:req.session.pseudo},function(err,user){
      if(err) {
       res.send(err);
@@ -207,7 +210,7 @@ apiRoutes.route('/dash')
        posts.texte = req.body.textPost;
        posts.auteur = user.pseudo;
        posts.date = datePost;
-       posts.srcfile = target_path;
+     //  posts.srcfile = target_path;
        posts.srcPhotoUser = user.srcfile;
        posts.save(function(err){
         if(err){
@@ -397,18 +400,36 @@ apiRoutes.route('/comments/:_id')
             if(err) {
               throw err;
             } else {
-              res.render('profilPublic',{
-              userFriend:user.friends,  
-              pseudo:user.pseudo,
-              srcfile:user.srcfile,
-              friends: user.friends.length,
-              userPublicId : userPublic._id,
-              userPublicSrcFile : userPublic.srcfile,
-              userPublicPseudo : userPublic.pseudo,
-              userPublicPresent : userPublic.presentation,
-              userPublicCountFriends : userPublic.friends.length,
-              userPubliCountPost : userPostPublic.length
-              });
+              for(var i = 0; i<user.friends.length;i++){
+                if(userPublic.pseudo === user.friends[i].pseudo){
+                  res.render('profilFriends',{
+                    userFriend:user.friends,  
+                    pseudo:user.pseudo,
+                    srcfile:user.srcfile,
+                    friends: user.friends.length,
+                    userPublicId : userPublic._id,
+                    userPublicSrcFile : userPublic.srcfile,
+                    userPublicPseudo : userPublic.pseudo,
+                    userPublicPresent : userPublic.presentation,
+                    userPublicCountFriends : userPublic.friends.length,
+                    userPubliCountPost : userPostPublic.length,
+                    allPostUserFriends : userPostPublic
+                  })
+                } else {
+                  res.render('profilPublic',{
+                    userFriend:user.friends,  
+                    pseudo:user.pseudo,
+                    srcfile:user.srcfile,
+                    friends: user.friends.length,
+                    userPublicId : userPublic._id,
+                    userPublicSrcFile : userPublic.srcfile,
+                    userPublicPseudo : userPublic.pseudo,
+                    userPublicPresent : userPublic.presentation,
+                    userPublicCountFriends : userPublic.friends.length,
+                    userPubliCountPost : userPostPublic.length
+                  });
+                }
+              }
             }
           });
         });
@@ -439,7 +460,7 @@ apiRoutes.route('/comments/:_id')
               }
               smtpTransport.close();
             });
-            addfriends = 
+            addFriends = 
               {
                 pseudo:userPublicInvite.pseudo,
                 srcfile:userPublicInvite.srcfile,
@@ -448,7 +469,7 @@ apiRoutes.route('/comments/:_id')
             
             Users.findByIdAndUpdate(
                 {_id: user._id},
-                {$push: {friends: addfriends}},
+                {$push: {friends: addFriends}},
                 {safe: true, upsert: true},
                 function(err, model) {
                     console.log(err);
@@ -468,24 +489,35 @@ apiRoutes.route('/comments/:_id')
           if(err){
             throw err;
           } else {
-            addfriends = 
-              {
-                pseudo:userPublicInvite.pseudo,
-                srcfile:userPublicInvite.srcfile,
-                status: 'Amis'
-              }            
-            Users.findOneAndUpdate(
-                {pseudo: req.session.pseudo},
-                {$push: {friends: addfriends}},
-                {safe: false, upsert: false},
+            for(var i = 0;i<user.friends.length;i++){
+              if(userPublicInvite.pseudo === user.friends[i].pseudo){
+                user.friends[i].status = 'Amis';
+                user.save(function(err) {
+                  if(err) {
+                    throw err;
+                  } else {
+                    console.log('status user modfified')
+                  }
+                })//user.save                    
+              }
+            }
+            addFriends = {
+                pseudo:user.pseudo,
+                srcfile:user.srcfile,
+                status: 'Amis'              
+            }
+            Users.findByIdAndUpdate(
+                {_id: userPublicInvite._id},
+                {$push: {friends: addFriends}},
+                {safe: true, upsert: true},
                 function(err, model) {
                     console.log(err);
                 }
-            );
+            );            
           var mailMdpLost = {
             from: "WriteItSocial@gmail.com",
               to: user.email,
-                subject: userPublicInvite.pseudo + "à confirmé l'invitation " ,
+                subject: userPublicInvite.pseudo + " a confirmé l'invitation " ,
                 html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + user.pseudo + "</h2><br><h2>Vous etes maintenant amis avec"+ "<br>" + userPublicInvite.pseudo +"</h2></div>"
             }
             smtpTransport.sendMail(mailMdpLost, function(error, response){
@@ -496,12 +528,14 @@ apiRoutes.route('/comments/:_id')
                 console.log("Mail envoyé avec succès!".info)
               }
               smtpTransport.close();
-            });    
-            res.redirect('/index')               
+            });            
+            res.redirect('/index');                
           }            
         });
       });
     });
+
+    
     
   apiRoutes.route('/friends')
     .get(function(req, res){
@@ -518,7 +552,31 @@ apiRoutes.route('/comments/:_id')
       }
     });
   });
-  
+
+  apiRoutes.post('/postMessage/:_id',function(req,res){
+    Users.findById(req.params._id,function(err,userFriends){
+      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+        var date = new Date();
+        var dateMessage = date.toLocaleString(); 
+        mess = 
+          {
+            pseudo:user.pseudo,
+            date:dateMessage,
+            texte: req.body.messPost
+          }  
+        Users.findByIdAndUpdate(
+          {_id: userFriends._id},
+          {$push: {messages: mess}},
+          {safe: true, upsert: true},
+          function(err, model) {
+            console.log(err);
+          }
+        );        
+      });
+    });
+  });
+
+
 
   apiRoutes.route('/deleteProfil/:_id')
     .get(function(req,res){

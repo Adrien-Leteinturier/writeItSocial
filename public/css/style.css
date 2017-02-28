@@ -74,20 +74,6 @@ a
     color: #27aae1;
 }
 
-h1, h2, h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-.h4, .h5, .h6, h4, h5, h6 {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-h3{
-    font-size: 24px;
-}
-h5, h5 {
-    font-size: 14px;
-}
 select
 {
     color:black;
@@ -1209,6 +1195,7 @@ i.modify
     margin-top:30px;
     margin-left: 110px;
     float: left;
+    font-size:3em;
 }
 .content-public-profil
 {
@@ -1218,6 +1205,7 @@ i.modify
 .present-profil-public
 {
     margin-bottom: 30px;
+    font-size: 2.6em;
 }
 .circle
 {
@@ -1278,6 +1266,34 @@ img.profile-photo-lg {
     width: 80px;
     border-radius: 50%;
 }
+
+/**************************PROFIL PUBLIC FRIENDS****************************************/
+
+.post-content-profil-friends
+{
+    background-color: #F8F8F8;
+    padding: 10px;
+    height:400px;
+    overflow: auto;
+}
+
+.imgPostDisplayFriends
+{
+    height: 80px;
+    width: 80px;
+}
+.contentPostDisplayFriends
+{
+    background-color: aliceblue;
+    padding: 10px;
+    margin-bottom:10px;
+}
+.content-public-profil p
+{
+    font-size: x-large;
+    font-weight: bold;
+}
+
 /*--------------------------HEAD----------------------------*/
 
 .Hitem1

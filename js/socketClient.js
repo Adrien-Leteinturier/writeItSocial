@@ -87,13 +87,14 @@
 /*------------------Submit event prevent---------------*/
 
 
-/*-----------------AJAX-------------------------------*/
+/*-----------------Ajax Create Post-------------------------*/
+ 
 $('#form-create-post').submit(function(event) {
     event.preventDefault();
-    var file =  $('#file')[0].files[0];
+  //  var file =  $('#file')[0].files[0];
     var data = {
         'textPost': $('#create-post-textarea').val(),
-        'image': file
+       // 'image': file
     };
     console.log(data)
 
@@ -106,6 +107,24 @@ $('#form-create-post').submit(function(event) {
     $('#create-post-textarea').val('')
 });
 
+/*-----------------Ajax Create message-------------------------*/
+
+/*$('#form-message-post').submit(function(event) {
+    event.preventDefault();
+  //  var file =  $('#file')[0].files[0];
+    var data = {
+        'textPost': $('#create-message-textarea').val()
+    };
+    console.log(data)
+
+    $.ajax({
+        type: 'POST',
+        url: '/dash',
+        data: data
+    }).done(function(result) {
+    })
+    $('#create-message-textarea').val('')
+});*/
 
     })
 })(window, io);
