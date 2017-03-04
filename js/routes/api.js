@@ -25,7 +25,7 @@ var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: "doublem93600$"
+			pass: ""
 					}
 });
 
@@ -395,7 +395,6 @@ apiRoutes.route('/comments/:_id')
       throw err;
     } else {
       Users.findById(req.params._id,function(err,userPublic){
-        console.log('icici' + userPublic);
         Post.find({auteur:userPublic.pseudo},function(err,userPostPublic){
             if(err) {
               throw err;
@@ -536,7 +535,6 @@ apiRoutes.route('/comments/:_id')
     });
 
     
-    
   apiRoutes.route('/friends')
     .get(function(req, res){
     Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -553,16 +551,44 @@ apiRoutes.route('/comments/:_id')
     });
   });
 
-  apiRoutes.post('/postMessage/:_id',function(req,res){
-    Users.findById(req.params._id,function(err,userFriends){
-      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+  apiRoutes.route('/messages')
+  .get(function(req,res){
+    Users.findOne({pseudo:req.session.pseudo},function(err,user){
+      var mess = user.messages
+      res.render('messages',{
+        userFriend:user.friends,  
+        pseudo:user.pseudo,
+        srcfile:user.srcfile,
+        friends: user.friends.length
+      })
+      io.emit('displayMess',mess)
+    });
+  });
+
+  apiRoutes.route('/deleteMessage/:_id')
+    .get(function(req,res){
+      Users.findById(req.params._id, function(err,user) {
+        if(err) {
+          throw err;
+        } else {
+          user.messages.remove({});
+          res.redirect('/messages');
+        }
+      })
+    })  
+
+  apiRoutes.route('/postMessage/:_id')
+  .post(function(req,res){
+    Users.findOne({pseudo:req.session.pseudo},function(err,user){
+      Users.findById(req.params._id,function(err,userFriends){
         var date = new Date();
         var dateMessage = date.toLocaleString(); 
         mess = 
           {
             pseudo:user.pseudo,
+            srcfile:user.srcfile,
             date:dateMessage,
-            texte: req.body.messPost
+            texte:req.body.messagePost
           }  
         Users.findByIdAndUpdate(
           {_id: userFriends._id},
@@ -570,11 +596,27 @@ apiRoutes.route('/comments/:_id')
           {safe: true, upsert: true},
           function(err, model) {
             console.log(err);
+          var mailMdpLost = {
+            from: "WriteItSocial@gmail.com",
+              to: userFriends.email,
+                subject: user.pseudo + " Vous à envoyé un message " ,
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
+            }
+            smtpTransport.sendMail(mailMdpLost, function(error, response){
+              if(error){
+                console.log("Erreur lors de l'envoie du mail!".error + error);
+                console.log(error.error);
+              } else {
+                console.log("Mail envoyé avec succès!".info)
+              }
+              smtpTransport.close();
+            });                  
           }
-        );        
+        );      
       });
     });
   });
+
 
 
 
@@ -687,6 +729,11 @@ apiRoutes.route('/comments/:_id')
         });
   // all post affichage ends // 
 
+  // all messages affichage // 
+        User.find({messages:user.messages}).sort([['date', -1]]).exec(function(err, docs) {
+          io.emit('allPostDisplay',docs);
+        });
+  // all messages affichage ends // 
 
 
   // search bar // 

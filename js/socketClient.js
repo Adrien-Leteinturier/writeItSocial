@@ -6,16 +6,16 @@
     var socket = io.connect();
 
 /*------------------Count reel Time---------------------*/
-        socket.on('usersCountLog', function (message) {
-            $('.num,.valueLogin').html(message);
+        socket.on('usersCountLog', function (data) {
+            $('.num,.valueLogin').html(data);
         });
 
-        socket.on('usersLiveCount', function (message) {
-            $('.valueConnect').html(message);
+        socket.on('usersLiveCount', function (data) {
+            $('.valueConnect').html(data);
         });        
 
-        socket.on('postItsCountLog', function (message) {
-            $('.valuePost').html(message);
+        socket.on('postItsCountLog', function (data) {
+            $('.valuePost').html(data);
         });
 
       /*  socket.on('friendLiveCountLog', function (message) {
@@ -28,8 +28,8 @@
 
 /*------------------List friends---------------------*/
 
-    socket.on('liveFriendList',function(message){
-        console.log(message);
+    socket.on('liveFriendList',function(data){
+        console.log(data);
     });
 
 /*------------------List friends ends---------------------*/
@@ -37,10 +37,7 @@
 
 /*------------------List all Post---------------------*/
    socket.on('allPostDisplay',function(data){
-       console.log(data);
-
-        $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
-
+       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
         //$('#comment').empty();
         $('#parentDiv').empty();
         for(var i = 0; i<data.length; i++){
@@ -79,14 +76,26 @@
                 $('#resultSearch').empty();
             }
         });
-
-
-
 /*------------------Search bar end---------------------*/
 
+
+/*------------------Display messages---------------------*/
+   socket.on('displayMess',function(data){
+       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
+       
+        $('#parentDivMessage').empty();
+        for(var i = 0; i<data.length; i++){
+            console.log(data[i].pseudo)
+                let htmlMessages = ('<div class="post-content-profil-friends"><div class="row no-margin contentPostDisplayFriends"><div class="col-md-4 col-sm-4 col-xs-4"><img class="img-profile-messages imgPostDisplayFriends" src="'+ data[i].srcfile +'" /><p>"'+ data[i].pseudo +'"</p></div><div class="col-md-8 col-sm-8 col-xs-8"><p>"'+ data[i].date +'"</p><br><p>"'+ data[i].texte +'"</p></div></div></div>')
+                $('#parentDivMessage').append(htmlMessages);
+        }
+    });        
+
+
+
+
+
 /*------------------Submit event prevent---------------*/
-
-
 /*-----------------Ajax Create Post-------------------------*/
  
 $('#form-create-post').submit(function(event) {
@@ -109,22 +118,24 @@ $('#form-create-post').submit(function(event) {
 
 /*-----------------Ajax Create message-------------------------*/
 
-/*$('#form-message-post').submit(function(event) {
+$('#form-message-post').submit(function(event) {
     event.preventDefault();
   //  var file =  $('#file')[0].files[0];
     var data = {
-        'textPost': $('#create-message-textarea').val()
+        'messagePost': $('#create-message-textarea').val()
     };
-    console.log(data)
+    var url = $("#form-message-post").attr('action');
+
 
     $.ajax({
         type: 'POST',
-        url: '/dash',
+        url: url,
         data: data
     }).done(function(result) {
+        alert('Message envoyé avec succés');
     })
     $('#create-message-textarea').val('')
-});*/
+});
 
     })
 })(window, io);

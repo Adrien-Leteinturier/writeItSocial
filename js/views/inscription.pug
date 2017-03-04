@@ -14,7 +14,7 @@ html
     section#banner
       #containerIndex.row
         .col-sm-12.col-xs-12
-            form#LogIn(method='POST',action='/inscription', enctype='multipart/form-data')
+            form#loginForm(method='POST',action='/inscription', enctype='multipart/form-data')
                 label Genre
                 br
                 br
@@ -61,8 +61,8 @@ html
                     span#redValid *       
                 img.formShadow(src='bottom-shadow.png')
     section#features
-      #containerIndex.wrapper.row
-        h1.section-titre-inscription|Inscription
+      #containerIndex.wrapper
+        h1.section-titre-inscription.hidden-xs|Inscription
     section#footer
       #containerIndex
         .row
