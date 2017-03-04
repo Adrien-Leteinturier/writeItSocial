@@ -1,0 +1,123 @@
+doctype html
+html
+  head
+    title Adrien Leteinturier - Write It Social
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
+    link(rel='stylesheet', href='foundation-icons/foundation-icons.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Raleway:400,600')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')
+    link(rel='stylesheet', href='style.css')
+    link(rel='stylesheet', href='jsUiBase.css')
+  body
+    section#head
+      nav.navbar.navbar-default.navbar-fixed-top.menu
+        .container
+          .navbar-header
+            button.navbar-toggle.collapsed.in(type='button',data-toggle='collapse',data-target='#bs-example-navbar-collapse-1')
+              span.sr-only|Toggle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='index')
+              img(src='logo-navbar.png',alt='logo')  
+          #bs-example-navbar-collapse-1.navbar-collapse.collapse
+            ul.nav.navbar-nav.navbar-right.main-menu
+              li.dropdown
+                a(href='#')|Home
+              li.dropdown
+                a(href='#')|À propos
+              li.dropdown
+                a(href='#')|Profil
+              li.dropdown
+                a(href='#')|Chat
+              li.dropdown
+                a(href='#')|Mentions légales
+            form.navbar-form.navbar-right.hidden-sm.form-search-bar
+              .form-group
+                i.icon.fi-magnifying-glass
+                input.form-control.search-bar(type='text',name='search',placeholder='Recherche des amis') 
+          .row.text-center
+            #resultSearch
+    .page-dashboard
+      .container
+        .row
+          .col-md-3.static
+            .profile-card
+              img.profile-photo(src='/' + srcfile, alt='user')
+              h5
+                a.text-white(href='#')=pseudo
+              a.text-white(href='#')
+                i.fi-torsos-all-female(style='font-size: 16px;')=friends 
+                  |  amis
+            ul.nav-news-feed
+              li
+                i.icon.fi-page-multiple
+                div
+                  a(href='#')
+                    | Mon flux 
+              li
+                i.icon.fi-torsos-all
+                div
+                  a(href='#')
+                    | Mes amis  
+              li
+                i.icon.fi-comments
+                div
+                  a(href='#')
+                    | Messages   
+              li
+                i.icon.fi-photo
+                div
+                  a(href='#')
+                    | Photos
+            #chat-block
+              div.title
+                |Chat online
+              ul.online-users.list-inline
+                each divImgFriend in userFriend
+                  li
+                    a(href='#')
+                      img.img-responsive.profile-photo(src=divImgFriend.srcfile,title=divImgFriend.pseudo) 
+          .col-md-7
+            .create-post
+              .row
+                .col-md-7.col-sm-7
+                  form.form-group.form-create-post(method='POST',action='/dash',enctype='multipart/form-data')
+                    img.profile-photo-md(src='/' + srcfile,alt='profile photo md')
+                    textarea#create-post-textarea.form-control(name='textPost',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
+                    ul.publishing-tools.list-inline
+                      li
+                        .fileUpload
+                          span.fi-photo
+                          input.upload(type='file',name='recfile',multiple accept='image/*')
+                .col-md-5.col-sm-5.col-xs-6
+                  .tools
+                    button.btn.btn-primary.pull-right.button-submit-post(type='submit')
+                      |Publish
+            each allPost in allPostUser          
+            .parent-div-post-content
+              .post-content
+                  img#post-image(src='uploads/Best-Anime-Dragon-Ball-Z-Desktop-Backgrounds-1.jpg', alt='post-image')
+                  .post-container
+                    img#post-author-image.profile-photo-md.pull-left(src='uploads/Best-Anime-Dragon-Ball-Z-Desktop-Backgrounds-1.jpg', alt='user')
+                    .post-detail
+                      .user-info
+                        h5
+                          a#name-user-post.profile-link(href='timeline.html') admin
+                          p#date-post Wed Feb 08 2017 22:17:19 GMT+0100 (CET)
+                      .reaction
+                      .line-divider
+                      #post-text
+                        p c&apos;est bon                                         
+    script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
+    script(type='text/javascript', src='socket.io.js')
+    script(type='text/javascript', src='socketClient.js')
+    script(type='text/javascript', src='jqueryBlog.js')
+    script(type='text/javascript', src='main_js_dash.js')
+
+
+      
