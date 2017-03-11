@@ -93,7 +93,8 @@ module.exports = function(app, express, io, mongoose) {
       res.render('inscription');
     })
     .post(upload.single('recfile'),function(req,res){
-      var users = new Users();
+      if(!req.file){
+        var users = new Users();
         users.genre = req.body.genre;
         users.age = req.body.age;
         users.prenom = req.body.prenom;
@@ -101,8 +102,20 @@ module.exports = function(app, express, io, mongoose) {
         users.pseudo = req.body.pseudo;
         users.password = req.body.password;
         users.email = req.body.email;
-        //users.srcfile = 'uploads/' + req.file.filename;
+        users.srcfile = 'http://lorempixel.com/400/200/abstract';
         users.presentation = req.body.present;
+      } else {
+        var users = new Users();
+        users.genre = req.body.genre;
+        users.age = req.body.age;
+        users.prenom = req.body.prenom;
+        users.nom = req.body.nom;
+        users.pseudo = req.body.pseudo;
+        users.password = req.body.password;
+        users.email = req.body.email;
+        users.srcfile = 'uploads/' + req.file.filename ;
+        users.presentation = req.body.present;
+      }
       users.save(function(err){
         if(err) {
           if(err.code == 11000) { //Nous permet de vérifier si un utilisateur existe déjà
@@ -270,10 +283,17 @@ apiRoutes.route('/post/:_id')
       } else {
        var date = new Date();
        var datePost = date.toLocaleString();     
-       posts.texte = req.body.textPost;
-       posts.auteur = req.session.pseudo;
-       posts.srcfile = 'uploads/' + req.file.filename;
-       posts.date = datePost;
+        if(!req.file){
+          posts.texte = req.body.textPost;
+          posts.auteur = req.session.pseudo;
+          posts.srcfile = posts.srcfile;
+          posts.date = datePost;
+        } else {
+          posts.texte = req.body.textPost;
+          posts.auteur = req.session.pseudo;
+          posts.srcfile = 'uploads/' + req.file.filename;
+          posts.date = datePost;          
+        }
        posts.save(function(err) {
         if(err) {
           throw err;
@@ -689,41 +709,78 @@ apiRoutes.route('/deleteMessages/:_id')
   
 
   apiRoutes.route('/chat/:_id')
+    .get(function(req,res){
+      Chats.findById(req.params._id,function(err,chatSession){
+        //console.log(req.params._id);
+        if(err){
+          console.log('error find Chat session route /chat:_id .get');
+        } else {
+         Users.findOne({pseudo: req.session.pseudo},function(err,user){
+            if(err){
+              console.log('error find user session route /chat:_id .get');
+            } else {
+            console.log('la session' + chatSession.participants);
+              res.render('roomChat',{
+                userFriend:user.friends,  
+                pseudo:user.pseudo,
+                srcfile:user.srcfile,
+                friends: user.friends.length,
+                chat:chatSession
+              });
+              io.emit('displaySessionListPart',chatSession.participants)
+            }
+          });
+        }
+      });
+    })
     .post(function(req,res){
       Users.findOne({pseudo:req.session.pseudo},function(err,user){
         if(err){
           console.log('Erreur find User session route /chat/:_id')
         } else {
-          Users.findById(req.params._id,function(err,userFriends){
+          Chats.findById(req.params._id,function(err,chatSession){
             if(err){
               console.log('Erreur find User params._id route /chat/:_id')
             } else {
+              var date = new Date();
+              var dateMessChat = date.toLocaleString();
+              var messageChat = {
+                pseudo:user.pseudo,
+                date:dateMessChat,
+                texte:req.body.textMessageChat
+              }
             Users.findByIdAndUpdate(
-              {_id: userFriends._id},
-              {$push: {messages: mess}},
+              {_id: chatSession._id},
+              {$push: {messages: messageChat}},
               {safe: true, upsert: true, new:true, sort:{messages:-1}},
               function(err, model) {
-            });              
-            var mailMdpLost = {
-              from: "WriteItSocial@gmail.com",
-              to: userFriends.email,
-              subject: user.pseudo + " Vous à invité à un chat " ,
-              html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à invité à un chat , Rejoingnez le depuis votre espace chat</h2></div>"
-            }
-            smtpTransport.sendMail(mailMdpLost, function(error, response){
-              if(error){
-                console.log("Erreur lors de l'envoie du mail!".error + error);
-                console.log(error.error);
+            });
+            for(var i = 0; i<chatSession.participants.length; i++){
+              if(user.pseudo === chatSession.participants[i].pseudo){
+                return
               } else {
-                console.log("Mail envoyé avec succès!".info)
+                var mailMdpLost = {
+                  from: "WriteItSocial@gmail.com",
+                  to: chatSession.participants[i].email,
+                  subject: user.pseudo + " à envoyé un message sur sa session chat " ,
+                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + chatSession.participants[i].pseudo + "</h2><br><h2>" + user.pseudo + " à envoyé un message sur sa session chat</h2></div>"
+                }
+                smtpTransport.sendMail(mailMdpLost, function(error, response){
+                  if(error){
+                    console.log("Erreur lors de l'envoie du mail!".error + error);
+                    console.log(error.error);
+                  } else {
+                    console.log("Mail envoyé avec succès!".info)
+                  }
+                    smtpTransport.close();
+                  });              
               }
-                smtpTransport.close();
-              });              
-            }
-          });
-        }
-      })      
-    })
+            }              
+          }
+        });
+      }
+    })      
+  })
 
 
 

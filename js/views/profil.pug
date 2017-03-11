@@ -115,12 +115,7 @@ html
               .col-md-5.col-sm-5.photo-profil.no-padding
                 img.img-responsive(src="/" + srcfile, alt="")
             .row.contentMessages.text-center.no-margin
-              p| Mes messages 
-                .col-md-12
-                  form#form-message-post.form-group(method='POST',action='/postMessage/' + userId ,enctype='multipart/form-data')
-                    textarea#create-message-textarea.form-control(name='mess',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
-                    button.btn.btn-primary.pull-right.button-submit-message(type='submit')
-                      |Envoyer                   
+              p| Mes messages                
             #parentDivMessageProfil
               each messProfil in userPublicMessages    
                 .post-message-profil-friends

@@ -17,8 +17,6 @@
         socket.on('postItsCountLog', function (data) {
             $('.valuePost').html(data);
         });
-
-     
 /*------------------Count reel Time ends---------------------*/
 
 /*------------------List friends---------------------*/
@@ -73,7 +71,6 @@
 /*------------------Display messages profil---------------------*/
    socket.on('displayMessPublic',function(data){
        console.log('ici audrey' + data)
-       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
        
         $('#parentDivMessageProfil').empty();
         for(var i = 0; i<data.length; i++){
@@ -86,20 +83,22 @@
 /*------------------Display Chat ---------------------*/
    socket.on('displayChat',function(data){
        console.log(data);
-       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
         $('#divChatParent').empty();
         for(var i = 0; i<data.length; i++){
-                if(data[i].participants < 1) {
-                    let htmlChats = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><p>Participants<p/><div class="row"><div class="col-md-2"></div></div><i class="fi-arrow-up" data.id='+ data[i]._id +'></i><i class="fi-trash"></i></div></div>')                    
+                    let htmlChats = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><div class="row"><div class="col-md-2"></div></div><a href="/chat/' + data[i]._id + '"><i class="fi-arrow-up"></i></a><i class="fi-trash"></i></div></div>')                    
                     $('#divChatParent').append(htmlChats);
-                } else {
-                for(var j = 0; j<data[i].participants.length;j++){
-                    let htmlChats = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><p>Participants<p/><div class="row"><div class="col-md-2"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].participants[j].srcfile +'"/></div></div><i class="fi-arrow-up" data.id='+ data[i]._id +'></i><i class="fi-trash"></i></div></div>')                    
-                    $('#divChatParent').append(htmlChats);
-                }
-            }
         }
     });     
+
+/*------------------Display Chat Session list Participant ---------------------*/
+   socket.on('displaySession',function(data){
+       console.log(data);
+        $('#displaySessionListPart').empty();
+        for(var i = 0; i<data.length; i++){
+            let htmlChatList = ('<div class="nav listPartLive"><img class="profile-photo-sm pull-left" src="../"'+ data[i].srcfile +' alt="' + data[i].pseudo + '" /><h3>'+ data[i].pseudo +'</h3></div>')                    
+            $('#displaySessionListPart').append(htmlChatList);
+        }
+    });         
 
 /*------------------Search bar-------------------------*/
         $('.form-search-bar').submit(function(event){
@@ -115,7 +114,7 @@
             console.log(data.users[0]);
             $('#resultSearch').empty();
             for(var i = 0; i<data.users.length;i++){
-                let htmlSearch = ('<div class="col-md-1 result-post"><a href="/profilPublic/'+ data.users[i]._id +'" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
+                let htmlSearch = ('<div class="col-md-2 result-post"><a href="/profilPublic/'+ data.users[i]._id +'" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
             $('#resultSearch').append(htmlSearch);
             }
             if($('.search-bar').val() === ''){
@@ -213,6 +212,27 @@ $('.crossInvite').on('click',function(){
         console.log('Session chat creer !')
     })
 })
+
+/*-----------------Ajax message chat -------------------------*/
+$('#form-create-message-chat').submit(function(event) {
+    event.preventDefault();
+    var data = {
+        'textMessageChat': $('#create-message-textarea').val()
+    };
+    var url = $('#form-create-message-chat').attr('action');
+    console.log(url);
+
+
+    $.ajax({
+        method: 'POST',
+        url: url,
+        data: data
+    }).done(function(result) {
+        alert('Message envoyé avec succés');
+    })
+    $('#create-message-textarea').val('')
+});
+
 
 
 

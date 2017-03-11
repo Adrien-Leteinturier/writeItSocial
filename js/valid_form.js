@@ -1,14 +1,6 @@
 $(document).ready(function(){
 
-    $('#loginForm').validator().on('submit', function (event) {
 
-        if($('#pseudo').val() === ''){
-        event.preventDefault();
-        $("#pseudo").notify("Veuillez renseigner un Pseudo", { position:"top left" });
-        } else {
-        
-        }
-    })
 
 // VALIDATION FORMULAIRE INSCRIPTION//   // VALIDATION FORMULAIRE CREATION POST IT //
 /*    var dialogs = [

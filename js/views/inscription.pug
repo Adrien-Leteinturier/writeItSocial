@@ -15,45 +15,44 @@ html
       #containerIndex.row
         .col-sm-12.col-xs-12
             form#loginForm(role='form' method='POST',action='/inscription', enctype='multipart/form-data' data-toggle='validator')
-              .form-group
-                label Genre
-                br      
-                select(name='genre')
-                  option
-                    | -- Selectionner -- 
-                  option
-                    | Homme
-                  option
-                    | Femme
-              .form-group
-                label Age
-                br
-                input#age(type='text',name='age', maxlength='2')
-              .form-group  
-                label Prénom
-                input#prenom(type='text',name='prenom')
-              .form-group  
-                label Nom         
-                input#nom(type='text',name='nom')
+              label Genre
+              br      
+              select(name='genre')
+                option
+                  | -- Selectionner -- 
+                option
+                  | Homme
+                option
+                  | Femme
+              br    
+              label Age
+              br
+              input#age(type='text',name='age', maxlength='2')
+              br  
+              label Prénom
+              input#prenom(type='text',name='prenom')  
+              label Nom         
+              input#nom(type='text',name='nom')
               .form-group  
                 label E-mail         
-                input#email(type='email',name='email')
-              .from-group  
-                label Photo de profil
-                input#file(type='file',name='recfile', multiple accept='image/*')
+                input#email(type='email',name='email' data-error="Veuillez renseigner votre E-mail" required)
+                .help-block.with-errors
+              label Photo de profil
+              input#file(type='file',name='recfile', multiple accept='image/*')  
+              label Présentation
+              textarea#presentation(name='present', maxlenght='140')          
+              p#infoBulle=message
               .form-group  
-                label Présentation
-                textarea#presentation(name='present', maxlenght='140')          
-                p#infoBulle=message
-              .form-group  
-                label Pseudo        
-                input#pseudo(type='text',name='pseudo') 
-              .form-group    
+                label.labelPdeuso Pseudo        
+                input#pseudo(type='text',name='pseudo' data-error="Veuillez renseigner un Pseudo" required)
+                .help-block.with-errors
+              .form-group       
                 label Mot de passe     
-                input#password(type='password',name='password')
+                input#password(type='password',name='password' data-error="Veuillez renseigner un Mot de passe" required)
+                .help-block.with-errors
               .text-center
-                button.button-inscription
-                  i.fi-check.icon-inscription
+              button.button-inscription
+                i.fi-check.icon-inscription
                   img.formShadow(src='bottom-shadow.png')
     section#footer
       #containerIndex

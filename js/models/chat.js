@@ -12,6 +12,7 @@ var chatsSchema = mongoose.Schema({
     participants: [
         {
             pseudo:String,
+            email:String,
             srcfile:String
         }
     ],

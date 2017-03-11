@@ -122,6 +122,8 @@ select
 }
 
 #containerIndex {
+    padding-right: 30px;		
+    padding-left: 30px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -132,7 +134,7 @@ select
     background-position: center;
     background-size: cover;
     width: 100%;
-    min-height: 1000px;
+    min-height: 600px;
     position: relative;
     top: 0;
 }
@@ -540,6 +542,13 @@ ul.contact-footer
 
 
 /*-------------------------Inscription----------------------------*/
+h1.section-titre
+{
+    color: #E6E7E8;
+    font-size: 7em;
+    margin: 40px 0;
+}
+
 
 h1.section-titre-inscription
 {
@@ -1338,7 +1347,46 @@ img.profile-photo-lg {
     cursor: pointer;
     color:#27AAE1;
 }
+/**************************CHAT SESSION****************************************/
 
+.hote
+{
+    padding: 4px;
+    background-color: lightblue;
+    border-radius: 5px;
+}
+.hote h3,.listPartLive h3
+{
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 6px;
+    font-size: 1.4em;
+}
+
+.listPartLive
+{
+    padding: 4px;
+    background-color: darkseagreen;
+    border-radius: 5px;   
+    margin-top: 16px; 
+}
+.overflowListPartChat
+{
+    overflow-y: auto;
+    height: 400px;
+}
+.chat-item{
+    background: rgba(141,198,63, .1);
+    margin-left: 50px;
+    padding: 5px 10px;
+    position: relative;
+    border-radius: 10px;
+}    
+.send-message
+{
+    margin-top: 40px;
+}
 /*--------------------------HEAD----------------------------*/
 
 .Hitem1

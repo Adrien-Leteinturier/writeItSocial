@@ -4,12 +4,12 @@ html
     title Adrien Leteinturier - Write It Social
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1, user-scalable=no')
-    link(rel='stylesheet', href='foundation-icons/foundation-icons.css')
+    link(rel='stylesheet', href='../../foundation-icons/foundation-icons.css')
     link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Raleway:400,600')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')
-    link(rel='stylesheet', href='style.css')
-    link(rel='stylesheet', href='jsUiBase.css')
+    link(rel='stylesheet', href='../../style.css')
+    link(rel='stylesheet', href='../../jsUiBase.css')
   body
     section#head
       nav.navbar.navbar-default.navbar-fixed-top.menu
@@ -21,7 +21,7 @@ html
               span.icon-bar
               span.icon-bar
             a.navbar-brand(href='index')
-              img(src='logo-navbar.png',alt='logo')  
+              img(src='../logo-navbar.png',alt='logo')  
           #bs-example-navbar-collapse-1.navbar-collapse.collapse
             ul.nav.navbar-nav.navbar-right.main-menu
               li.dropdown
@@ -39,13 +39,13 @@ html
                 i.icon.fi-magnifying-glass
                 input.form-control.search-bar(type='text',name='search',placeholder='Recherche des amis') 
           .row.text-center
-            #resultSearch      
+            #resultSearch
     .page-dashboard
       .container
         .row
           .col-md-3.static
             .profile-card
-              img.profile-photo(src='/' + srcfile, alt='user')
+              img.profile-photo(src='../' + srcfile, alt='user')
               h5
                 a.text-white(href='#')=pseudo
               a.text-white(href='#')
@@ -60,7 +60,7 @@ html
               li
                 i.icon.fi-torsos-all
                 div
-                  a(href='profil')
+                  a(href='friends')
                     | Mes amis  
               li
                 i.icon.fi-comments
@@ -79,29 +79,56 @@ html
                 each divImgFriend in userFriend
                   li
                     a(href='#')
-                      img.img-responsive.profile-photo(src=divImgFriend.srcfile,title=divImgFriend.pseudo) 
+                      img.img-responsive.profile-photo(src='../' + divImgFriend.srcfile,title=divImgFriend.pseudo) 
           .col-md-7
-            .head-public-profil.no-padding.text-center
-            .row
-              .col-md-12.col-sm-12.col-xs-12.text-center
-                button.btn.btn-primary.crossInvite(type='button')          
-                  i.fi-plus
-            #divChatParent
-              each dipslayChatsUser in listUserChats
-                .row.no-margin.contentChatsDisplay.text-center
-                  .col-md-offset-2.col-sm-offset-2.col-xs-offset-2.col-md-8.col-sm-8.col-xs-8
-                    img.img-profile-messages.imgPostDisplayFriends(src=dipslayChatsUser.srcfile)
-                    p=dipslayChatsUser.hote
-                    a(href="/chat/" + dipslayChatsUser._id)        
-                      i.fi-arrow-up            
-                    i.fi-trash
+            .create-post
+              .row
+                .col-md-7.col-sm-7
+                  form#form-create-post.form-group(method='POST',action='/dash',enctype='multipart/form-data')
+                    img.profile-photo-md(src='../' + srcfile,alt='profile photo md')
+                    textarea#create-post-textarea.form-control(name='textPost',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
+                    ul.publishing-tools.list-inline
+                      li
+                        .fileUpload
+                          span.fi-photo
+                          input#file.upload(type='file',name='file',multiple accept='image/*')
+                .col-md-5.col-sm-5.col-xs-6
+                  .tools
+                    button.btn.btn-primary.pull-right.button-submit-post(type='submit')
+                      |Publish
+            .chat-room
+              .row
+                .col-md-5.overflowListPartChat
+                  .nav.hote
+                    img.profile-photo-sm.pull-left(src='../' + chat.srcfile, alt='Hote')
+                    h3=chat.hote
+                  #displaySessionListPart    
+                    - for(var i = 0;i<chat.participants.length;i++)
+                      .nav.listPartLive
+                        img.profile-photo-sm.pull-left(src='../' + chat.participants[i].srcfile, alt=chat.participants[i].pseudo)
+                        h3=chat.participants[i].pseudo
+                .col-md-7.overflowListPartChat
+                  ul.chat-message
+                    li.left
+                      img.profile-photo-sm.pull-left(src='images/users/user-2.jpg', alt='')                
+                      .chat-item
+                        .chat-item-header
+                          h5 Linda Lohan
+                          small.text-muted 3 days ago
+                          p Hi honey, how are you doing???? Long time no see. Where have you been?
+              .row
+                .col-md-12      
+                  .send-message
+                    form#form-create-message-chat.form-group(type='text', action='/chat/' + chat._id)
+                      input.form-control(type='text', name='textMessageChat', placeholder='Ecris ton messages')
+                      button.btn.btn-primary.pull-right.button-submit-post(type='button') Send                               
     section#footer
       #containerIndex
         .row
           #footer-wrapper
             .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
               a(href='index',alt='Home')
-                img#logoFooter(src='logo-footer.png')
+                img#logoFooter(src='../logo-footer.png')
               ul.socialList
                 li
                   a(href='#',alt='Facebook')
@@ -128,13 +155,13 @@ html
                   p.phone| 06-18-33-96-13
                 li
                   i.icon-contact.fi-mail
-                  p.mail| adrienleteinturier@gmail.com                    
+                  p.mail| adrienleteinturier@gmail.com
     script(src='https://code.jquery.com/jquery-3.1.1.min.js')
     script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
-    script(type='text/javascript', src='socket.io.js')
-    script(type='text/javascript', src='socketClient.js')
-    script(type='text/javascript', src='jqueryBlog.js')
+    script(type='text/javascript', src='../socket.io.js')
+    script(type='text/javascript', src='../socketClient.js')
+    script(type='text/javascript', src='../jqueryBlog.js')
 
 
-      
+  
