@@ -1,0 +1,25 @@
+          .col-md-7
+            .head-public-profil.no-padding.text-center
+            .row
+              .col-md-12.col-sm-12.col-xs-12.text-center
+                button.btn.btn-primary.crossInvite(type='button', data-toggle='modal', data-target='#myModal')          
+                  i.fi-plus
+            #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+                .modal-dialog(role='document')
+                    .modal-content
+                      .modal-header.text-center
+                          h5#exampleModalLabel.modal-title 
+                          | Chat Live        
+                          button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') 
+                            | &times;   
+                      .modal-body
+                        each userFriendDisplay in userFriend
+                          .row
+                            .col-md-12
+                              .row
+                                .col-md-2.text-center
+                                  img.img-profile-messages.imgPostDisplayFriends(src=userFriendDisplay.srcfile)
+                                  p=userFriendDisplay.pseudo                                  
+                      .modal-footer    
+                          button.btn.btn-primary(type='button') Invitation au chat     
