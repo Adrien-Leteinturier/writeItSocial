@@ -7,7 +7,6 @@ var app = express();
 //var URL = 'mongodb://localhost:27017/DiwJs04'
 
 //var fs = require('fs');
-var tools = require('./tools');
 var mailer = require('nodemailer');
 //var server = require('http').Server(app);
 var colors = require('colors');

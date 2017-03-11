@@ -14,55 +14,47 @@ html
     section#banner
       #containerIndex.row
         .col-sm-12.col-xs-12
-            form#loginForm(method='POST',action='/inscription', enctype='multipart/form-data')
+            form#loginForm(role='form' method='POST',action='/inscription', enctype='multipart/form-data' data-toggle='validator')
+              .form-group
                 label Genre
-                br
-                br
+                br      
                 select(name='genre')
-                    option
-                        | -- Selectionner -- 
-                    option
-                        | Homme
-                    option
-                        | Femme
-                br
-                br
+                  option
+                    | -- Selectionner -- 
+                  option
+                    | Homme
+                  option
+                    | Femme
+              .form-group
                 label Age
                 br
-                br
                 input#age(type='text',name='age', maxlength='2')
-                br
+              .form-group  
                 label Prénom
-                span#redValid *
                 input#prenom(type='text',name='prenom')
-                label Nom
-                span#redValid *          
+              .form-group  
+                label Nom         
                 input#nom(type='text',name='nom')
-                label E-mail
-                span#redValid *          
+              .form-group  
+                label E-mail         
                 input#email(type='email',name='email')
+              .from-group  
                 label Photo de profil
-                span#redValid *
                 input#file(type='file',name='recfile', multiple accept='image/*')
+              .form-group  
                 label Présentation
-                br
                 textarea#presentation(name='present', maxlenght='140')          
                 p#infoBulle=message
-                label Pseudo
-                span#redValid *          
-                input#pseudo(type='text',name='pseudo')
-                label Mot de passe
-                span#redValid *          
+              .form-group  
+                label Pseudo        
+                input#pseudo(type='text',name='pseudo') 
+              .form-group    
+                label Mot de passe     
                 input#password(type='password',name='password')
-                .text-center
-                  button.button-inscription
-                    i.fi-check.icon-inscription
-                p#champsObligatoires Champs obligatoires
-                    span#redValid *       
-                img.formShadow(src='bottom-shadow.png')
-    section#features
-      #containerIndex.wrapper
-        h1.section-titre-inscription.hidden-xs|Inscription
+              .text-center
+                button.button-inscription
+                  i.fi-check.icon-inscription
+                  img.formShadow(src='bottom-shadow.png')
     section#footer
       #containerIndex
         .row
@@ -98,24 +90,13 @@ html
                   p.phone| 06-18-33-96-13
                 li
                   i.icon-contact.fi-mail
-                  p.mail| adrienleteinturier@gmail.com
-    #dialogFirstName.dialogPrenom(title='Erreur !!!')
-      p Veuillez renseignez un prenom
-    #dialogLastName.dialogNom(title='Erreur !!!')
-      p Veuillez renseignez un nom
-    #dialogPs.dialogPseudo(title='Erreur !!!')
-      p Veuillez renseignez un pseudo
-    #dialogMdpEmpty.dialogPasswordEmpty(title='Erreur !!!')
-      p Veuillez renseignez un Mot de passe
-    #dialogMdpMinLength.dialogPasswordMinLength(title='Erreur !!!')
-      p Veuillez renseignez un Mot de passe d'un minimum de 8 caractères
-    #dialogMail.dialogEmail(title='Erreur !!!')
-      p Veuillez renseignez un E-mail valide
-    #dialogProfil.dialogPicProfil(title='Erreur !!!')
-      p Veuillez choisir votre photo de profil        
+                  p.mail| adrienleteinturier@gmail.com    
     script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.js')
     script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
     script(type='text/javascript', src='socket.io.js')
     script(type='text/javascript', src='socketClient.js')
     script(type='text/javascript', src='valid_form.js')
+    script(type='text/javascript', src='notify.min.js')
+    

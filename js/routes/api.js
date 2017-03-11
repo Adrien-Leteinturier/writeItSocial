@@ -17,6 +17,7 @@ var mailer = require('nodemailer');
 var config = require('../config'); //On va faire appel à nos configuration présentent dans le fichier config.js
 var Post = require('../models/posts.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/posts.js)
 var Users = require('../models/users.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
+var Chats = require('../models/chat.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
 var mySecret = config.secret; /* variable qui fait appel  */
 
 
@@ -92,11 +93,6 @@ module.exports = function(app, express, io, mongoose) {
       res.render('inscription');
     })
     .post(upload.single('recfile'),function(req,res){
-      var tmp_path = req.file.path
-      var target_path = 'uploads/' + req.file.originalname;
-      var src = fs.createReadStream(tmp_path);
-      var dest = fs.createWriteStream(target_path);
-      src.pipe(dest);
       var users = new Users();
         users.genre = req.body.genre;
         users.age = req.body.age;
@@ -105,7 +101,7 @@ module.exports = function(app, express, io, mongoose) {
         users.pseudo = req.body.pseudo;
         users.password = req.body.password;
         users.email = req.body.email;
-        users.srcfile = target_path;
+        //users.srcfile = 'uploads/' + req.file.filename;
         users.presentation = req.body.present;
       users.save(function(err){
         if(err) {
@@ -197,21 +193,25 @@ apiRoutes.route('/dash')
   .post(upload.single('file'),function(req,res){
     var date = new Date();
     var datePost = date.toLocaleString(); 
-   // var tmp_path = req.body.image.path;
-   // var target_path = 'uploads/' + req.body.image.name;
-   // var src = fs.createReadStream(tmp_path);
-   // var dest = fs.createWriteStream(target_path);
-   // src.pipe(dest);
     Users.findOne({pseudo:req.session.pseudo},function(err,user){
      if(err) {
       res.send(err);
      } else {
-       var posts = new Post();
-       posts.texte = req.body.textPost;
-       posts.auteur = user.pseudo;
-       posts.date = datePost;
-     //  posts.srcfile = target_path;
-       posts.srcPhotoUser = user.srcfile;
+       if(!req.file){
+        var posts = new Post();
+        posts.texte = req.body.textPost;
+        posts.auteur = user.pseudo;
+        posts.date = datePost;
+        posts.srcfile = '';
+        posts.srcPhotoUser = user.srcfile;
+       } else {
+        var posts = new Post();
+        posts.texte = req.body.textPost;
+        posts.auteur = user.pseudo;
+        posts.date = datePost;
+        posts.srcPhotoUser = user.srcfile;         
+        posts.srcfile = 'uploads/' + req.file.filename;
+       }
        posts.save(function(err){
         if(err){
         throw err;
@@ -269,15 +269,10 @@ apiRoutes.route('/post/:_id')
         throw err;
       } else {
        var date = new Date();
-       var datePost = date.toLocaleString(); 
-       var tmp_path = req.file.path
-       console.log(tmp_path);
-       var target_path = 'uploads/' + req.body.image;
-       var src = fs.createReadStream(tmp_path);
-       var dest = fs.createWriteStream(target_path);        
+       var datePost = date.toLocaleString();     
        posts.texte = req.body.textPost;
        posts.auteur = req.session.pseudo;
-       posts.srcfile = target_path;
+       posts.srcfile = 'uploads/' + req.file.filename;
        posts.date = datePost;
        posts.save(function(err) {
         if(err) {
@@ -319,8 +314,8 @@ apiRoutes.route('/comments/:_id')
     }) 
   })
   
-  /*
-apiRoutes.route('/comments/:_id')
+
+/*apiRoutes.route('/comments/:_id')
   .post(function(req,res){
     Users.findOne({pseudo:req.session.pseudo},function(err,user){
           var date = new Date();
@@ -344,10 +339,12 @@ apiRoutes.route('/comments/:_id')
   apiRoutes.route('/profil')
     .get(function(req,res){
       Users.findOne({pseudo: req.session.pseudo},function(err,user){
+        io.emit('displayMess',user.messages)
         if(err){
           throw err;
         } else {
           res.render('profil',{
+            userId : user._id,
             genre:user.genre,
             age:user.age,
             prenom:user.prenom, 
@@ -359,32 +356,34 @@ apiRoutes.route('/comments/:_id')
             srcfile: user.srcfile,
             friends: user.friends.length,
             scrFileFriend:user.friends,
-            postAll: user
+            userPublicMessages: user.messages
           });          
         }
       });      
     })
     .post(function(req,res){
-      Users.findOne({pseudo: req.session.pseudo}, function(err,user){
-        if(err){
-          throw err;
-        } else {
-          user.age = req.body.age;
-          user.prenom = req.body.prenom;
-          user.nom = req.body.nom;
-          user.pseudo = req.body.pseudo;
-          user.password = req.body.password;
-          user.email = req.body.email;
-          //user.srcfile = target_path;
-          user.presentation = req.body.present;
-          user.save(function(err) {
-            if(err) {
-              throw err;
-            } else {
-              res.redirect('/profil');
-            }
-          })//user.save       
-        }
+      Users.find({},function(err,allUser){
+        Users.findOne({pseudo: req.session.pseudo}, function(err,user){
+          if(err){
+            throw err;
+          } else {
+            user.age = req.body.age;
+            user.prenom = req.body.prenom;
+            user.nom = req.body.nom;
+            user.pseudo = req.body.pseudo;
+            user.password = req.body.password;
+            user.email = req.body.email;
+            //user.srcfile = target_path;
+            user.presentation = req.body.present;
+            user.save(function(err) {
+              if(err) {
+                throw err;
+              } else {
+                res.redirect('/profil');
+              }
+            })//user.save       
+          }
+        })
       })
     })
 
@@ -399,8 +398,8 @@ apiRoutes.route('/comments/:_id')
             if(err) {
               throw err;
             } else {
-              for(var i = 0; i<user.friends.length;i++){
-                if(userPublic.pseudo === user.friends[i].pseudo){
+           //   for(var i = 0; i<user.friends.length;i++){
+                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
                   res.render('profilFriends',{
                     userFriend:user.friends,  
                     pseudo:user.pseudo,
@@ -412,6 +411,7 @@ apiRoutes.route('/comments/:_id')
                     userPublicPresent : userPublic.presentation,
                     userPublicCountFriends : userPublic.friends.length,
                     userPubliCountPost : userPostPublic.length,
+                    userPublicMessages : userPublic.messages,
                     allPostUserFriends : userPostPublic
                   })
                 } else {
@@ -428,7 +428,7 @@ apiRoutes.route('/comments/:_id')
                     userPubliCountPost : userPostPublic.length
                   });
                 }
-              }
+            //  }
             }
           });
         });
@@ -551,31 +551,30 @@ apiRoutes.route('/comments/:_id')
     });
   });
 
-  apiRoutes.route('/messages')
-  .get(function(req,res){
-    Users.findOne({pseudo:req.session.pseudo},function(err,user){
-      var mess = user.messages
-      res.render('messages',{
-        userFriend:user.friends,  
-        pseudo:user.pseudo,
-        srcfile:user.srcfile,
-        friends: user.friends.length
-      })
-      io.emit('displayMess',mess)
-    });
-  });
 
-  apiRoutes.route('/deleteMessage/:_id')
+apiRoutes.route('/deleteMessages/:_id')
     .get(function(req,res){
-      Users.findById(req.params._id, function(err,user) {
-        if(err) {
-          throw err;
-        } else {
-          user.messages.remove({});
-          res.redirect('/messages');
-        }
-      })
-    })  
+        Users.findOne({pseudo:req.session.pseudo}, function(err,result) {
+          if(err) {
+            throw err;
+          } else {
+            for(var i=0; i < result.messages.length; i++){
+              console.log(result.messages[i]._id);
+              if(result.messages[i]._id == req.params._id){
+                console.log('oui')
+                result.messages.id(req.params._id).remove();
+                result.save(function (err) {
+                  if (err) return handleError(err);
+                  console.log('the sub-doc was removed')
+                });      
+              }
+          }
+          io.emit('displayMess',result.messages);
+          io.emit('displayMessPublic',result.messages);
+          res.send(result);
+          }          
+        })
+    })   
 
   apiRoutes.route('/postMessage/:_id')
   .post(function(req,res){
@@ -593,32 +592,42 @@ apiRoutes.route('/comments/:_id')
         Users.findByIdAndUpdate(
           {_id: userFriends._id},
           {$push: {messages: mess}},
-          {safe: true, upsert: true},
+          {safe: true, upsert: true, new:true, sort:{messages:-1}},
           function(err, model) {
+            console.log('ici audrey' + model);
+           /* model.messages.sort(function (a,b) {
+            return b.date - a.date ;
+            });  */          
+            io.emit('displayMess',model.messages);
+            io.emit('displayMessPublic',model.messages);
             console.log(err);
-          var mailMdpLost = {
-            from: "WriteItSocial@gmail.com",
-              to: userFriends.email,
-                subject: user.pseudo + " Vous à envoyé un message " ,
-                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
-            }
-            smtpTransport.sendMail(mailMdpLost, function(error, response){
-              if(error){
-                console.log("Erreur lors de l'envoie du mail!".error + error);
-                console.log(error.error);
-              } else {
-                console.log("Mail envoyé avec succès!".info)
+            if(model.pseudo === user.pseudo){
+              Users.distinct('admin', function(error, results){
+                console.log('distinct value' + results);
+              });
+              return
+            } else {
+            var mailMdpLost = {
+              from: "WriteItSocial@gmail.com",
+                to: userFriends.email,
+                  subject: user.pseudo + " Vous à envoyé un message " ,
+                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
               }
-              smtpTransport.close();
-            });                  
+              smtpTransport.sendMail(mailMdpLost, function(error, response){
+                if(error){
+                  console.log("Erreur lors de l'envoie du mail!".error + error);
+                  console.log(error.error);
+                } else {
+                  console.log("Mail envoyé avec succès!".info)
+                }
+                smtpTransport.close();
+              });                  
+            }
           }
         );      
       });
     });
-  });
-
-
-
+  })
 
   apiRoutes.route('/deleteProfil/:_id')
     .get(function(req,res){
@@ -632,59 +641,96 @@ apiRoutes.route('/comments/:_id')
       })
     })
 
-
-
-
-
-
-
-
-
-/*
-  app.get('/profil',function(req,res){
-  var pseudo = req.session.pseudo;
-  if(req.session.pseudo){
-    collectionPost_its.find({auteur:pseudo}).sort({date : -1}).toArray(function(err, data) {
-      collectionUsers.find({pseudo:pseudo},{
-       
-        _id:1,
-        genre:1,
-        age:1,
-        prenom:1,
-        nom:1,
-        pseudo:1,
-        password:1,
-        email:1,
-        srcfile:1,
-        presentation:1,
-        friends:1
-
-      }).toArray(function(err, result) {
-        console.log(result[0].srcfile)
-
-        res.render('profil',{
-          genre:result[0].genre,
-          age:result[0].age,
-          prenom:result[0].prenom, 
-          nom:result[0].nom, 
-          pseudo:pseudo, 
-          password:result[0].password, 
-          email:result[0].email,
-          presentation: result[0].presentation, 
-          srcfile: result[0].srcfile,
-          friends: result[0].friends.length,
-          scrFileFriend:result[0].friends,
-          postAll: data
-          });
-      });
-    });
-
+//#################################
+  apiRoutes.route('/chat')
+    .get(function(req,res){
+      Chats.find({hote:req.session.pseudo},function(err,userChats){
+        if(err){
+          console.log('error find User session route /chat .get');
         } else {
-          var pseudo = '';
-          res.redirect('/');
+         Users.findOne({pseudo: req.session.pseudo},function(err,user){
+            console.log(userChats);
+            if(err){
+              console.log('error find Chats user session route /chat .get');
+            } else {
+              res.render('chatBoard',{
+                userFriend:user.friends,  
+                pseudo:user.pseudo,
+                srcfile:user.srcfile,
+                friends: user.friends.length,
+                listUserChats : userChats
+              });
+            }
+          });
         }
-});
-*/
+      });
+    })
+    .post(function(req,res){
+      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+        if(err){
+          console.log('error find User session route /chat .post')
+        } else {
+          var chat = new Chats();
+          chat.hote = user.pseudo;
+          chat.srcfile = user.srcfile;
+          chat.save(function(err){
+            if(err){
+              console.log('error save chat session route /chat .post')
+            } else {
+              Chats.find({hote:req.session.pseudo},function(err,userChats){
+                console.log('aller lOM' + userChats)
+              io.emit('displayChat',userChats);
+              })
+            }
+          })
+        }
+      });
+    })
+  
+
+  apiRoutes.route('/chat/:_id')
+    .post(function(req,res){
+      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+        if(err){
+          console.log('Erreur find User session route /chat/:_id')
+        } else {
+          Users.findById(req.params._id,function(err,userFriends){
+            if(err){
+              console.log('Erreur find User params._id route /chat/:_id')
+            } else {
+            Users.findByIdAndUpdate(
+              {_id: userFriends._id},
+              {$push: {messages: mess}},
+              {safe: true, upsert: true, new:true, sort:{messages:-1}},
+              function(err, model) {
+            });              
+            var mailMdpLost = {
+              from: "WriteItSocial@gmail.com",
+              to: userFriends.email,
+              subject: user.pseudo + " Vous à invité à un chat " ,
+              html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à invité à un chat , Rejoingnez le depuis votre espace chat</h2></div>"
+            }
+            smtpTransport.sendMail(mailMdpLost, function(error, response){
+              if(error){
+                console.log("Erreur lors de l'envoie du mail!".error + error);
+                console.log(error.error);
+              } else {
+                console.log("Mail envoyé avec succès!".info)
+              }
+                smtpTransport.close();
+              });              
+            }
+          });
+        }
+      })      
+    })
+
+
+
+
+
+
+/**********************SOCKET***************************/ 
 
   // Compteur live Server //
   var countLive = 0;
@@ -729,15 +775,10 @@ apiRoutes.route('/comments/:_id')
         });
   // all post affichage ends // 
 
-  // all messages affichage // 
-        User.find({messages:user.messages}).sort([['date', -1]]).exec(function(err, docs) {
-          io.emit('allPostDisplay',docs);
-        });
-  // all messages affichage ends // 
+
 
 
   // search bar // 
-
     socket.on( 'searchBar', function ( search ) { // quand je recoi des infos en socket , a chaque fois que quelqun tape une nouvelle lettre dans la bar de recherche du header
       console.log('valeur de search bar ' + search);
       Users.find( { pseudo: { $regex: '^'+search, $options: 'i' } } ).sort( { pseudo: 1 } ).exec( function ( err, data ) { // je cherche tous les pseudo qui contien c lettre et je les tries
@@ -751,6 +792,9 @@ apiRoutes.route('/comments/:_id')
     });
   // search bar ends //
   });
+
+
+
 
 
 return apiRoutes;

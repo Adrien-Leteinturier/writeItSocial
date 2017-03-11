@@ -15,6 +15,11 @@ $(document).ready(function(){
     }); 
     // EVENT SUBMIT BUTTON MODIFY FORM POST ENDS //
 
-
+    // EVENT MODAL CHAT  //
+    $('#myModal').on('shown.bs.modal', function () {
+        $('#myInput').focus()
+    })
+     // EVENT MODAL CHAT ENDS //
 });
+
 

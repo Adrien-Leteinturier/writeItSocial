@@ -98,22 +98,32 @@ html
                   h4| Nombres d'amis
                   .circle
                     p=userPublicCountFriends
-              .row
-              p| Messages
+            .row.contentMessages.text-center.no-margin
+              p| Hello mes amis envoyer moi des messages !
                 .col-md-12
                   form#form-message-post.form-group(method='POST',action='/postMessage/' + userPublicId ,enctype='multipart/form-data')
                     textarea#create-message-textarea.form-control(name='mess',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
                     button.btn.btn-primary.pull-right.button-submit-message(type='submit')
                       |Envoyer      
-              p| Les posts
-            .post-content-profil-friends
-              each dipslayPostUserFriends in allPostUserFriends
-                .row.no-margin.contentPostDisplayFriends
-                  .col-md-4.col-sm-4.col-xs-4
-                    img.imgPostDisplayFriends(src='http://ismahane.i.s.pic.centerblog.net/u59eukc7.jpg')
-                  .col-md-8.col-sm-8.col-xs-8
-                    p=dipslayPostUserFriends.date
-                    p=dipslayPostUserFriends.texte
+            #parentDivMessage
+              each messProfilFriends in userPublicMessages    
+                .post-message-profil-friends
+                    .row.no-margin.contentPostDisplayFriends
+                        .col-md-4.col-sm-4.col-xs-4.text-center
+                          img.img-profile-messages.imgPostDisplayFriends(src="../" + messProfilFriends.srcfile)
+                          p=messProfilFriends.pseudo
+                        .texteMessages.col-md-8.col-sm-8.col-xs-8.texteMessages
+                          p.mess=messProfilFriends.texte
+                          p.mess=messProfilFriends.date               
+            p| Les posts
+              .post-content-profil-friends
+                each dipslayPostUserFriends in allPostUserFriends
+                  .row.no-margin.contentPostDisplayFriends
+                    .col-md-4.col-sm-4.col-xs-4
+                      img.imgPostDisplayFriends(src='http://ismahane.i.s.pic.centerblog.net/u59eukc7.jpg')
+                    .col-md-8.col-sm-8.col-xs-8
+                      p=dipslayPostUserFriends.date
+                      p=dipslayPostUserFriends.texte
       section#footer
           #containerIndex
             .row

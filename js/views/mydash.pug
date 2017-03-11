@@ -84,14 +84,14 @@ html
             .create-post
               .row
                 .col-md-7.col-sm-7
-                  form.form-group.form-create-post(method='POST',action='/dash',enctype='multipart/form-data')
+                  form.form-group#form-create-post(method='POST',action='/dash',enctype='multipart/form-data')
                     img.profile-photo-md(src='/' + srcfile,alt='profile photo md')
                     textarea#create-post-textarea.form-control(name='textPost',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
                     ul.publishing-tools.list-inline
                       li
                         .fileUpload
                           span.fi-photo
-                          input.upload(type='file',name='recfile',multiple accept='image/*')
+                          input.upload(type='file',name='file',multiple accept='image/*')
                 .col-md-5.col-sm-5.col-xs-6
                   .tools
                     button.btn.btn-primary.pull-right.button-submit-post(type='submit')

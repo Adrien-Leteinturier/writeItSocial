@@ -109,11 +109,29 @@ html
                       textarea#presentation(name='present', maxlenght='140',placeholder=presentation)
                   button.btn.btn-primary.button-modify-post(type='submit')
                     |Modifier
-                  a.btn.btn-primary.pull-right.button-delete-user(href="/deleteProfil/" + postAll._id,alt='delete post',title='Supprimer')
+                  a.btn.btn-primary.pull-right.button-delete-user(href="/deleteProfil/" + userId,alt='delete post',title='Supprimer')
                     |Supprimer 
                   p|Avertissement : Si vous decidez de supprimer ou de modifier votre profil, cette action sera definitive.         
               .col-md-5.col-sm-5.photo-profil.no-padding
-                img.img-responsive(src="/" + srcfile, alt="")  
+                img.img-responsive(src="/" + srcfile, alt="")
+            .row.contentMessages.text-center.no-margin
+              p| Mes messages 
+                .col-md-12
+                  form#form-message-post.form-group(method='POST',action='/postMessage/' + userId ,enctype='multipart/form-data')
+                    textarea#create-message-textarea.form-control(name='mess',cols='30',rows='1',placeholder='Écrivez ce que vous souhaitez')
+                    button.btn.btn-primary.pull-right.button-submit-message(type='submit')
+                      |Envoyer                   
+            #parentDivMessageProfil
+              each messProfil in userPublicMessages    
+                .post-message-profil-friends
+                    .row.no-margin.contentPostDisplayFriends
+                        .col-md-4.col-sm-4.col-xs-4.text-center
+                          img.img-profile-messages.imgPostDisplayFriends(src=messProfil.srcfile)
+                          p=messProfil.pseudo
+                        .texteMessages.col-md-8.col-sm-8.col-xs-8.texteMessages
+                          a.deleteMess.fi-trash(data-id=messProfil._id)
+                          p.mess=messProfil.texte
+                          p.mess=messProfil.date 
       section#footer
           #containerIndex
             .row

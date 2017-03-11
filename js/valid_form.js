@@ -1,6 +1,17 @@
 $(document).ready(function(){
+
+    $('#loginForm').validator().on('submit', function (event) {
+
+        if($('#pseudo').val() === ''){
+        event.preventDefault();
+        $("#pseudo").notify("Veuillez renseigner un Pseudo", { position:"top left" });
+        } else {
+        
+        }
+    })
+
 // VALIDATION FORMULAIRE INSCRIPTION//   // VALIDATION FORMULAIRE CREATION POST IT //
-    var dialogs = [
+/*    var dialogs = [
         '#dialogAge',
         '#dialogFirstName',
         '#dialogLastName',
@@ -88,7 +99,7 @@ $(document).ready(function(){
                     $('.dialogArea').dialog('close');
                 })
             }
-            else if($('.fileUpload input.upload').val() === ''){
+            else if($('#file').val() == ''){
                 console.log('empty')
                 event.preventDefault();
                 console.log('prevent')
@@ -100,5 +111,6 @@ $(document).ready(function(){
             }
         });
             
-    });
+    });*/
+
 });
