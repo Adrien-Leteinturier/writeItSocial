@@ -98,7 +98,7 @@ html
                       |Publish
             .chat-room
               .row
-                .col-md-5.overflowListPartChat
+                .col-md-4.overflowListPartChat
                   .nav.hote
                     img.profile-photo-sm.pull-left(src='../' + chat.srcfile, alt='Hote')
                     h3=chat.hote
@@ -107,21 +107,22 @@ html
                       .nav.listPartLive
                         img.profile-photo-sm.pull-left(src='../' + chat.participants[i].srcfile, alt=chat.participants[i].pseudo)
                         h3=chat.participants[i].pseudo
-                .col-md-7.overflowListPartChat
-                  ul.chat-message
-                    li.left
-                      img.profile-photo-sm.pull-left(src='images/users/user-2.jpg', alt='')                
-                      .chat-item
-                        .chat-item-header
-                          h5 Linda Lohan
-                          small.text-muted 3 days ago
-                          p Hi honey, how are you doing???? Long time no see. Where have you been?
+                .col-md-8.overflowListPartChat
+                  #displaySessionListMess
+                    - for(var j = 0;j<chat.messages.length;j++)
+                      ul.chat-message
+                        li.left
+                          img.profile-photo-sm.pull-left(src='../' + chat.messages[j].srcfile , alt=chat.messages[j].pseudo)                
+                          .chat-item
+                            .chat-item-header
+                              h5=chat.messages[j].pseudo
+                              p=chat.messages[j].texte
               .row
                 .col-md-12      
                   .send-message
-                    form#form-create-message-chat.form-group(type='text', action='/chat/' + chat._id)
-                      input.form-control(type='text', name='textMessageChat', placeholder='Ecris ton messages')
-                      button.btn.btn-primary.pull-right.button-submit-post(type='button') Send                               
+                    form#form-create-message-chat.form-group(type='text' method='POST' action='/chat/' + chat._id)
+                      input.form-control.input-message-chat(type='text' name='textMessageChat' placeholder='Ecris ton messages')
+                      button.btn.btn-primary.pull-right.button-submit-message-chat(type='submit') Send                               
     section#footer
       #containerIndex
         .row

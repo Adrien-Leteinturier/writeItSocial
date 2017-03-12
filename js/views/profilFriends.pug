@@ -81,19 +81,19 @@ html
                     a(href='#')
                       img.img-responsive.profile-photo(src='../' + divImgFriend.srcfile,title=divImgFriend.pseudo) 
           .col-md-7
-            .head-public-profil.no-padding.text-center
-              ul
-                li
-                  h3=userPublicPseudo        
-              img.img-profil-public(src="../" + userPublicSrcFile, alt="")
+            .head-public-profil.no-margin.text-center.row
+              .col-md-12
+                h3=userPublicPseudo
+                p| Nom : #{userPublicNom}
+                p| Prénom : #{userPublicPrenom}
+              .col-md-12.text-center          
+                img.img-profil-public(src="../" + userPublicSrcFile, alt="")
             .content-public-profil.text-center
-              h3.present-profil-public=userPublicPresent
               .row
                 .col-md-6
                   h4| Posts créer
                   .circle
                     p=userPubliCountPost
-
                 .col-md-6
                   h4| Nombres d'amis
                   .circle
@@ -120,7 +120,7 @@ html
                 each dipslayPostUserFriends in allPostUserFriends
                   .row.no-margin.contentPostDisplayFriends
                     .col-md-4.col-sm-4.col-xs-4
-                      img.imgPostDisplayFriends(src='http://ismahane.i.s.pic.centerblog.net/u59eukc7.jpg')
+                      img.imgPostDisplayFriends(src='../' + dipslayPostUserFriends.srcfile)
                     .col-md-8.col-sm-8.col-xs-8
                       p=dipslayPostUserFriends.date
                       p=dipslayPostUserFriends.texte

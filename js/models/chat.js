@@ -20,6 +20,7 @@ var chatsSchema = mongoose.Schema({
         {
             pseudo:String,
             date:String,
+            srcfile:String,
             texte:String
         }
     ]

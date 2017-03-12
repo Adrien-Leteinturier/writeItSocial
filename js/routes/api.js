@@ -426,6 +426,8 @@ apiRoutes.route('/comments/:_id')
                     srcfile:user.srcfile,
                     friends: user.friends.length,
                     userPublicId : userPublic._id,
+                    userPublicPrenom: userPublic.prenom,
+                    userPublicNom: userPublic.nom,
                     userPublicSrcFile : userPublic.srcfile,
                     userPublicPseudo : userPublic.pseudo,
                     userPublicPresent : userPublic.presentation,
@@ -719,7 +721,22 @@ apiRoutes.route('/deleteMessages/:_id')
             if(err){
               console.log('error find user session route /chat:_id .get');
             } else {
-            console.log('la session' + chatSession.participants);
+              if(user.pseudo == chatSession.hote){
+                console.log('hote')
+                return
+              } else {
+              part = 
+                {
+                  pseudo:user.pseudo,
+                  srcfile:user.srcfile
+                }  
+              Chats.findByIdAndUpdate(
+                {_id: chatSession._id},
+                {$push: {participants: part}},
+                {safe: true, upsert: false, new:true},
+                function(err, model) {  
+                });               
+              }
               res.render('roomChat',{
                 userFriend:user.friends,  
                 pseudo:user.pseudo,
@@ -734,53 +751,49 @@ apiRoutes.route('/deleteMessages/:_id')
       });
     })
     .post(function(req,res){
-      Users.findOne({pseudo:req.session.pseudo},function(err,user){
-        if(err){
-          console.log('Erreur find User session route /chat/:_id')
-        } else {
+        Users.findOne({pseudo:req.session.pseudo},function(err,user){
           Chats.findById(req.params._id,function(err,chatSession){
-            if(err){
-              console.log('Erreur find User params._id route /chat/:_id')
-            } else {
-              var date = new Date();
-              var dateMessChat = date.toLocaleString();
-              var messageChat = {
+            console.log(chatSession._id)
+            var date = new Date();
+            var dateMessageChat = date.toLocaleString(); 
+            mess = 
+              {
                 pseudo:user.pseudo,
-                date:dateMessChat,
-                texte:req.body.textMessageChat
-              }
-            Users.findByIdAndUpdate(
+                srcfile:user.srcfile,
+                date:dateMessageChat,
+                texte:req.body.messageChat
+              }  
+            Chats.findByIdAndUpdate(
               {_id: chatSession._id},
-              {$push: {messages: messageChat}},
+              {$push: {messages: mess}},
               {safe: true, upsert: true, new:true, sort:{messages:-1}},
-              function(err, model) {
-            });
-            for(var i = 0; i<chatSession.participants.length; i++){
-              if(user.pseudo === chatSession.participants[i].pseudo){
-                return
-              } else {
+              function(err, model) {      
+                io.emit('displayMessageSession',model.messages);
+                console.log(err);
+                if(model.hote === user.pseudo){
+                  return
+                } else {
                 var mailMdpLost = {
                   from: "WriteItSocial@gmail.com",
-                  to: chatSession.participants[i].email,
-                  subject: user.pseudo + " à envoyé un message sur sa session chat " ,
-                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + chatSession.participants[i].pseudo + "</h2><br><h2>" + user.pseudo + " à envoyé un message sur sa session chat</h2></div>"
-                }
-                smtpTransport.sendMail(mailMdpLost, function(error, response){
-                  if(error){
-                    console.log("Erreur lors de l'envoie du mail!".error + error);
-                    console.log(error.error);
-                  } else {
-                    console.log("Mail envoyé avec succès!".info)
+                    to: userFriends.email,
+                      subject: user.pseudo + " Vous à envoyé un message " ,
+                      html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
                   }
+                  smtpTransport.sendMail(mailMdpLost, function(error, response){
+                    if(error){
+                      console.log("Erreur lors de l'envoie du mail!".error + error);
+                      console.log(error.error);
+                    } else {
+                      console.log("Mail envoyé avec succès!".info)
+                    }
                     smtpTransport.close();
-                  });              
+                  });                 
+                }
               }
-            }              
-          }
+            );      
+          });
         });
-      }
-    })      
-  })
+      })
 
 
 
