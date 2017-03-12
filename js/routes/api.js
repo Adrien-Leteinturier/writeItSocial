@@ -419,7 +419,7 @@ apiRoutes.route('/comments/:_id')
               throw err;
             } else {
            //   for(var i = 0; i<user.friends.length;i++){
-                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
+                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1 || user.friends.map(e => e.status).indexOf('Amis') === -1 ){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
                   res.render('profilFriends',{
                     userFriend:user.friends,  
                     pseudo:user.pseudo,
@@ -483,9 +483,10 @@ apiRoutes.route('/comments/:_id')
             });
             addFriends = 
               {
+                _id:userPublicInvite._id,
                 pseudo:userPublicInvite.pseudo,
                 srcfile:userPublicInvite.srcfile,
-                status: 'Invitation en cours...'
+                status: 'En attente de confirmation...'
               }
             
             Users.findByIdAndUpdate(
@@ -523,6 +524,7 @@ apiRoutes.route('/comments/:_id')
               }
             }
             addFriends = {
+                _id : user._id,
                 pseudo:user.pseudo,
                 srcfile:user.srcfile,
                 status: 'Amis'              
@@ -676,6 +678,7 @@ apiRoutes.route('/deleteMessages/:_id')
               console.log('error find Chats user session route /chat .get');
             } else {
               res.render('chatBoard',{
+                userListInviteChat : user.invitationChat,
                 userFriend:user.friends,  
                 pseudo:user.pseudo,
                 srcfile:user.srcfile,
@@ -692,23 +695,24 @@ apiRoutes.route('/deleteMessages/:_id')
         if(err){
           console.log('error find User session route /chat .post')
         } else {
+          var date = new Date();
+          var dateCreateChat = date.toLocaleString(); 
           var chat = new Chats();
           chat.hote = user.pseudo;
           chat.srcfile = user.srcfile;
+          chat.createDate = dateCreateChat;
           chat.save(function(err){
             if(err){
               console.log('error save chat session route /chat .post')
             } else {
-              Chats.find({hote:req.session.pseudo},function(err,userChats){
-                console.log('aller lOM' + userChats)
-              io.emit('displayChat',userChats);
-              })
+              console.log('ICIICI' + req.session.pseudo)
             }
+            res.redirect('/chat');
           })
         }
       });
     })
-  
+
 
   apiRoutes.route('/chat/:_id')
     .get(function(req,res){
@@ -721,30 +725,53 @@ apiRoutes.route('/deleteMessages/:_id')
             if(err){
               console.log('error find user session route /chat:_id .get');
             } else {
-              if(user.pseudo == chatSession.hote){
-                console.log('hote')
-                return
-              } else {
-              part = 
-                {
+                if(user.pseudo == chatSession.hote || chatSession.participants.map(e => e.pseudo).indexOf(user.pseudo) !== -1){
+                res.render('roomChat',{
+                  userFriend:user.friends,  
                   pseudo:user.pseudo,
-                  srcfile:user.srcfile
-                }  
-              Chats.findByIdAndUpdate(
-                {_id: chatSession._id},
-                {$push: {participants: part}},
-                {safe: true, upsert: false, new:true},
-                function(err, model) {  
-                });               
+                  srcfile:user.srcfile,
+                  friends: user.friends.length,
+                  chat:chatSession
+                });      
+                 io.emit('displaySession',chatSession.participants)
+              } else {
+                part = 
+                  {
+                    pseudo:user.pseudo,
+                    srcfile:user.srcfile
+                  }  
+                Chats.findByIdAndUpdate(
+                  {_id: chatSession._id},
+                  {$push: {participants: part}},
+                  {safe: true, upsert: true, new:true},
+                  function(err, model) {  
+                  io.emit('displaySession',model.participants)
+                  res.render('roomChat',{
+                    userFriend:user.friends,  
+                    pseudo:user.pseudo,
+                    srcfile:user.srcfile,
+                    friends: user.friends.length,
+                    chat:chatSession
+                  });
+                    Users.findOne({pseudo:chatSession.hote},function(err,userHote){
+                      var mailMdpLost = {
+                        from: "WriteItSocial@gmail.com",
+                          to: userHote.email,
+                            subject: user.pseudo + " à rejoins votre chat " ,
+                            html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userHote.pseudo + "</h2><br><h2>" + user.pseudo + " à rejoins votre chat</h2></div>"
+                        }
+                        smtpTransport.sendMail(mailMdpLost, function(error, response){
+                          if(error){
+                            console.log("Erreur lors de l'envoie du mail!".error + error);
+                            console.log(error.error);
+                          } else {
+                            console.log("Mail envoyé avec succès!".info)
+                          }
+                          smtpTransport.close();
+                      });             
+                    })             
+                });           
               }
-              res.render('roomChat',{
-                userFriend:user.friends,  
-                pseudo:user.pseudo,
-                srcfile:user.srcfile,
-                friends: user.friends.length,
-                chat:chatSession
-              });
-              io.emit('displaySessionListPart',chatSession.participants)
             }
           });
         }
@@ -770,30 +797,60 @@ apiRoutes.route('/deleteMessages/:_id')
               function(err, model) {      
                 io.emit('displayMessageSession',model.messages);
                 console.log(err);
-                if(model.hote === user.pseudo){
-                  return
-                } else {
-                var mailMdpLost = {
-                  from: "WriteItSocial@gmail.com",
-                    to: userFriends.email,
-                      subject: user.pseudo + " Vous à envoyé un message " ,
-                      html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
-                  }
-                  smtpTransport.sendMail(mailMdpLost, function(error, response){
-                    if(error){
-                      console.log("Erreur lors de l'envoie du mail!".error + error);
-                      console.log(error.error);
-                    } else {
-                      console.log("Mail envoyé avec succès!".info)
-                    }
-                    smtpTransport.close();
-                  });                 
-                }
               }
             );      
           });
         });
       })
+
+  apiRoutes.route('/inviteChat/:_id')
+    .post(function(req,res){
+      Users.findOne({pseudo:req.session.pseudo},function(err,user){
+        if(err){
+          console.log('error find user session route /chat:_id .put');
+        } else {
+          Users.findById(req.params._id,function(err,userFriends){
+            console.log('LALALLALA'+userFriends._id)
+            if(err){
+              console.log('error find Chat session route /chat:_id .put');
+            } else {
+            var date = new Date();
+            var dateInviteChat = date.toLocaleString(); 
+              var inviteChat = {
+                hote : user.pseudo,
+                srcfile : user.srcfile,
+                date : dateInviteChat,      
+                url: req.body.urlChat    
+              }
+              Users.findByIdAndUpdate(
+                  {_id: userFriends._id},
+                  {$push: {invitationChat: inviteChat}},
+                  {safe: true, upsert: true, new:true},
+                  function(err, model) {  
+                    io.emit('dislayInviteChat',model)
+                }); 
+                var mailMdpLost = {
+                from: "WriteItSocial@gmail.com",
+                to: userFriends.email,
+                subject: user.pseudo + " Vous à envoyé une invitation à son chat " ,
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé une invitation à son chat , accessible sur votre espace chat.</h2></div>"
+              }
+              smtpTransport.sendMail(mailMdpLost, function(error, response){
+              if(error){
+                console.log("Erreur lors de l'envoie du mail!".error + error);
+                console.log(error.error);
+              } else {
+                console.log("Mail envoyé avec succès!".info)
+              }
+              smtpTransport.close();
+             });                             
+            }
+          })
+        }
+      })
+    })
+      
+
 
 
 

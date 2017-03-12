@@ -80,22 +80,13 @@
         }
     }); 
 
-/*------------------Display Chat ---------------------*/
-   socket.on('displayChat',function(data){
-       console.log(data);
-        $('#divChatParent').empty();
-        for(var i = 0; i<data.length; i++){
-                    let htmlChats = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><a href="/chat/' + data[i]._id + '"><i class="fi-arrow-up"></i></a><i class="fi-trash"></i></div></div>')                    
-                    $('#divChatParent').append(htmlChats);
-        }
-    });     
 
 /*------------------Display Chat Session list Participant ---------------------*/
    socket.on('displaySession',function(data){
        console.log(data);
         $('#displaySessionListPart').empty();
         for(var i = 0; i<data.length; i++){
-            let htmlChatList = ('<div class="nav listPartLive"><img class="profile-photo-sm pull-left" src="../"'+ data[i].srcfile +' alt="' + data[i].pseudo + '" /><h3>'+ data[i].pseudo +'</h3></div>')                    
+            let htmlChatList = ('<div class="nav listPartLive"><img class="profile-photo-sm pull-left" src="../'+ data[i].srcfile +'" alt="' + data[i].pseudo + '" /><h3>'+ data[i].pseudo +'</h3></div>')                    
             $('#displaySessionListPart').append(htmlChatList);
         }
     });       
@@ -109,6 +100,18 @@
             $('#displaySessionListMess').append(htmlMessList);
         }
     });        
+
+/*------------------Display Invitation Chat Session  ---------------------*/
+   socket.on('dislayInviteChat',function(data){
+       console.log(data);
+        $('#divInviteChatParent').empty();
+        for(var i = 0; i<data.length; i++){
+           let htmlInvitChat = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><a href="/chat/' + data[i]._id + '"><i class="fi-arrow-up"></i></a><i class="fi-trash"></i></div></div>')                    
+           $('#divInviteChatParent').append(htmlInvitChat);
+        }
+    });          
+
+
 
 /*------------------Search bar-------------------------*/
         $('.form-search-bar').submit(function(event){
@@ -210,14 +213,19 @@ $(document).on('click','.deleteMess', function() {
     })
 });
 
+
+
+
+
 /*-----------------Ajax create chat -------------------------*/
-$('.crossInvite').on('click',function(){
+$('#crossInvite').on('click',function(){
     console.log('click cross');
     $.ajax({
         method:'POST',
         url: '/chat'
     }).done(function(result){
         console.log('Session chat creer !')
+        location.reload(true);
     })
 })
 
@@ -240,7 +248,22 @@ $('#form-create-message-chat').submit(function(event) {
     $('.input-message-chat').val('')
 });
 
-
+/*-----------------Ajax invite chat -------------------------*/
+$('#inviteFriendsChat').click(function(event) {
+    
+    event.preventDefault();
+    var url = $('#inviteFriendsChat').attr('action');
+    var data = {
+        'urlChat': $('#inviteFriendsChat').attr('data-id')
+    };    
+    console.log(data)
+    $.ajax({
+        method: 'POST',
+        url: url,
+        data: data
+    }).done(function(result) {
+    })
+});
 
 
 

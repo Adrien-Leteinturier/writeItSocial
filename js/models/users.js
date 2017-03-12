@@ -32,6 +32,14 @@ var usersSchema = mongoose.Schema({
             date : String,
             texte : String
         }
+    ],
+    invitationChat : [
+        {
+            hote : String,
+            srcfile : String,
+            date : String,
+            url : String
+        }
     ]
 });
 

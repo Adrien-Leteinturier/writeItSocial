@@ -122,7 +122,27 @@ html
                   .send-message
                     form#form-create-message-chat.form-group(type='text' method='POST' action='/chat/' + chat._id)
                       input.form-control.input-message-chat(type='text' name='textMessageChat' placeholder='Ecris ton messages')
-                      button.btn.btn-primary.pull-right.button-submit-message-chat(type='submit') Send                               
+                      button.btn.btn-primary.pull-right.button-submit-message-chat(type='submit') Send
+                  button.btn.btn-primary(type='button', data-toggle='modal', data-target='#myModal' data-id=chat._id)          
+                    i.fi-plus
+            #myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+                .modal-dialog(role='document')
+                    .modal-content
+                      .modal-header.text-center
+                          h5#exampleModalLabel.modal-title 
+                          | Chat Live        
+                          button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') 
+                            | &times;   
+                      .modal-body
+                        each userFriendDisplay in userFriend
+                          .row
+                            .col-md-12
+                              .row
+                                .col-md-2.text-center
+                                  a#inviteFriendsChat(method='POST' action='/inviteChat/' + userFriendDisplay._id, data-id=chat._id)
+                                    img.img-profile-messages(src='../' + userFriendDisplay.srcfile)
+                                  p=userFriendDisplay.pseudo                                                          
     section#footer
       #containerIndex
         .row

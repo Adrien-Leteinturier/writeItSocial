@@ -9,6 +9,7 @@ var Schema = mongoose.Schema;
 var chatsSchema = mongoose.Schema({
     hote:String,
     srcfile:String,
+    createDate:String,
     participants: [
         {
             pseudo:String,

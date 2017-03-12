@@ -84,17 +84,41 @@ html
             .head-public-profil.no-padding.text-center
             .row
               .col-md-12.col-sm-12.col-xs-12.text-center
-                button.btn.btn-primary.crossInvite(type='button')          
+                button.btn.btn-primary#crossInvite(type='button')          
                   i.fi-plus
             #divChatParent
               each dipslayChatsUser in listUserChats
                 .row.no-margin.contentChatsDisplay.text-center
-                  .col-md-offset-2.col-sm-offset-2.col-xs-offset-2.col-md-8.col-sm-8.col-xs-8
+                  .col-md-4.col-sm-4.col-xs-4
                     img.img-profile-messages.imgPostDisplayFriends(src=dipslayChatsUser.srcfile)
+                  .col-md-2.col-sm-2.col-xs-2
+                    h3| Hote 
                     p=dipslayChatsUser.hote
+                  .col-md-2.col-sm-2.col-xs-2
+                    p| Crée le : 
+                    h3=dipslayChatsUser.createDate  
+                  .col-md-2.col-sm-2.col-xs-2  
                     a(href="/chat/" + dipslayChatsUser._id)        
                       i.fi-arrow-up            
-                    i.fi-trash
+                    i.fi-trash 
+            .contentMessages.text-center
+              p| Invitations chat
+            #divInviteChatParent
+              each dipslayInviteChat in userListInviteChat
+                .row.no-margin.contentChatsDisplay.text-center
+                  .col-md-4.col-sm-4.col-xs-4
+                    img.img-profile-messages.imgPostDisplayFriends(src=dipslayInviteChat.srcfile)
+                  .col-md-2.col-sm-2.col-xs-2
+                    h3| Hote 
+                    p=dipslayInviteChat.hote
+                  .col-md-2.col-sm-2.col-xs-2
+                    p| Crée le : 
+                    h3=dipslayInviteChat.createDate  
+                  .col-md-2.col-sm-2.col-xs-2  
+                    a(href="/chat/" + dipslayInviteChat.url)        
+                      i.fi-arrow-up            
+                    i.fi-trash               
+                        
     section#footer
       #containerIndex
         .row

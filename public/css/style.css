@@ -60,19 +60,18 @@ table {
     color:#ef4136;
 }
 
-p {
-    display: block;
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
-}
+
 
 a
 {
-    color: #27aae1;
+
+    text-decoration: none !important;
 }
 
+a:hover
+{
+    color: #27aae1 !important;
+}
 select
 {
     color:black;
@@ -1317,12 +1316,12 @@ img.profile-photo-lg {
 }
 /**************************CHAT BOARD****************************************/
 
-.crossInvite > i
+#crossInvite > i
 {
     color: gray;
     font-size: 5em;
 }
-.crossInvite{
+#crossInvite{
     background-color: whitesmoke;
     cursor: pointer;
     margin-bottom: 50px;
@@ -1333,6 +1332,14 @@ img.profile-photo-lg {
     padding: 10px;
     margin-bottom: 10px;
     background-color: whitesmoke;
+}
+.contentChatsDisplay h3{
+    font-size: 0.9em;
+}
+.contentChatsDisplay p{
+    font-size: 1.1em;
+    color:#27AAE1; 
+    font-weight: bold;
 }
 .fi-arrow-up
 {
