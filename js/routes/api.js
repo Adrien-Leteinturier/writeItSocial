@@ -1,10 +1,3 @@
-/* The API controller
-   Exports 3 methods:
-   * post - Creates a new thread
-   * list - Returns a list of threads
-   * show - Displays a thread and its posts
-*/
-
 var session = require('express-session');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/'});
@@ -18,15 +11,14 @@ var config = require('../config'); //On va faire appel à nos configuration pré
 var Post = require('../models/posts.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/posts.js)
 var Users = require('../models/users.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
 var Chats = require('../models/chat.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
-var mySecret = config.secret; /* variable qui fait appel  */
+var mySecret = config.secret; /* variable qui fait appel a la config pour la verif du token  */
 
-
-
+/****************NODE MAILER CONFIG*********************/ 
 var smtpTransport = mailer.createTransport("SMTP",{
   service: "Gmail",
 	  auth: {
 		  user: "adrienleteinturier@gmail.com",
-			pass: ""
+			pass: "doublem93600$"
 					}
 });
 
@@ -42,10 +34,11 @@ module.exports = function(app, express, io, mongoose) {
     resave: false
   }))
 
+  /****************ROUTE PAGE ACCUEIL*********************/ 
+
   apiRoutes.get('/index',function(req,res){
     res.redirect('/');
   })
-
   apiRoutes.get('/', function(req, res) {
     Post.find({},function(err,posts){
       var data1 = posts.slice (0, 5);
@@ -56,7 +49,7 @@ module.exports = function(app, express, io, mongoose) {
     })
   });  
 
-
+  /****************ROUTE MOT DE PASSE OUBLIER*********************/ 
   apiRoutes.route('/mdpLost')
     .get(function(req,res){
       res.render('mdpLost');
@@ -87,7 +80,7 @@ module.exports = function(app, express, io, mongoose) {
       })
     })
 
-
+  /****************ROUTE INSCRIPTION *********************/ 
     apiRoutes.route('/inscription')
     .get(function(req,res){
       res.render('inscription');
@@ -102,6 +95,7 @@ module.exports = function(app, express, io, mongoose) {
         users.pseudo = req.body.pseudo;
         users.password = req.body.password;
         users.email = req.body.email;
+        users.role = 0;
         users.srcfile = 'http://lorempixel.com/400/200/abstract';
         users.presentation = req.body.present;
       } else {
@@ -113,80 +107,136 @@ module.exports = function(app, express, io, mongoose) {
         users.pseudo = req.body.pseudo;
         users.password = req.body.password;
         users.email = req.body.email;
+        users.role = 0;        
         users.srcfile = 'uploads/' + req.file.filename ;
         users.presentation = req.body.present;
       }
-      users.save(function(err){
-        if(err) {
-          if(err.code == 11000) { //Nous permet de vérifier si un utilisateur existe déjà
-            return res.render('inscription' ,{success: false, message: 'Un utilisateur avec ce pseudo d\'utilisateur existe déjà.'});
-          } else {
-            return res.send(err);
-          }
+    users.save(function(err){
+      if(err) {
+        if(err.code == 11000) { //Nous permet de vérifier si un utilisateur existe déjà
+          return res.render('inscription' ,{success: false, message: 'Un utilisateur avec ce pseudo d\'utilisateur existe déjà.'});
         } else {
-          res.redirect('/');
+          return res.send(err);
         }
-      })
+      } else {
+        res.redirect('/');
+      }
     })
+  })
 
 
+  /****************ROUTE PAGE ACCUEIL*********************/ 
 
-    
+  apiRoutes.get('/aPropos',function(req,res){
+    res.render('aPropos');
+  })
+
+  /****************ROUTE VERIF USER CONNEXION MIDDLEWARE*********************/     
   apiRoutes.post('/authenticate', function(req, res) {
     Users.findOne({pseudo: req.body.pseudo},function(err,user){
       if (err) throw err;
       if (!user) {
-        res.json({ success: false, message: 'Authentication failed. User not found.' });
+        res.redirect('/')
       } else if (user) {
-        // check if password matches
+        // verifie si le password correspond
         if (user.password != req.body.password) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+          res.redirect('/')
         } else {
-          // if user is found and password is right
-          // create a token
+          // cretion d'un token
           var token = jwt.sign({
-                  pseudo: user.pseudo,
-                  prenom: user.prenom,
-                  nom: user.nom,
-                  password: user.password
-                }, mySecret,
-                  { expiresIn: '24h' } //Expire au bout de 24h, une nouvelle authentification sera nécessaire
-                );
-                req.session.token = token;
-                req.session.pseudo = req.body.pseudo;
-          // return the information including token as JSON
-          res.redirect('/dash');
+            pseudo: user.pseudo,
+            prenom: user.prenom,
+            nom: user.nom,
+            password: user.password
+          }, mySecret,
+            { expiresIn: '24h' } //Expire au bout de 24h, une nouvelle authentification sera nécessaire
+          );
+            req.session.token = token;
+            req.session.pseudo = req.body.pseudo;
+          // verification du role de l'utilisateur
+          if(user.role === 1){
+            res.redirect('/admin')
+          } else {
+            res.redirect('/dash');
+          } 
         }   
       }
     });
   });
-apiRoutes.use(function(req, res, next) {
-  // check header or url parameters or post parameters for token
-  var token = req.session.token;
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, mySecret, function(err, decoded) {      
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;    
-        next();
-      }
-    });
-  } else {
-    // if there is no token
-    // return an error
-    return res.status(403).send({ 
-        success: false, 
-        message: 'No token provided.' 
-    });
-  }
-});
+  apiRoutes.use(function(req, res, next) {
+    // Vérifier les paramètres d'en-tête ou d'url ou post paramètres pour le jeton
+    var token = req.session.token;
+    // decode token
+    if (token) {
+      // Vérifie le secret et vérifie les exp
+      jwt.verify(token, mySecret, function(err, decoded) {      
+        if (err) {
+          return res.json({ success: false, message: 'Failed to authenticate token.' });   
+          res.redirect('/') 
+        } else {
+          // Si tout est bon, sauf pour demander à utiliser dans d'autres itinéraires
+          req.decoded = decoded;    
+          next();
+        }
+      });
+    } else {
+      // S'il n'y a pas de jeton
+       // redirect a l'index
+      res.redirect('/');
+    }
+  });
 
 
+/****************ROUTE ADMIN*********************/ 
+  apiRoutes.route('/admin')
+    .get(function(req, res){
+      Users.find({},function(err,allUser){
+      Users.findOne({pseudo: req.session.pseudo},function(err,user){
+        if(err) {
+          res.send(err);
+        } else {
+          res.render('admin',{
+          userFriend:user.friends,  
+          pseudo:user.pseudo,
+          srcfile:user.srcfile,
+          friends: user.friends.length,
+          allUtilisateur : allUser,
+          });
+        }
+      });
+    })
+  });
 
+  apiRoutes.route('/allChat')
+    .get(function(req, res){
+      Chats.find({},function(err,allChats){
+      Users.find({},function(err,allUser){        
+        Users.findOne({pseudo: req.session.pseudo},function(err,user){
+        if(err) {
+            res.send(err);
+          } else {
+            if(user.role === 1){
+              res.render('allChat',{
+              userFriend:user.friends,  
+              pseudo:user.pseudo,
+              srcfile:user.srcfile,
+              friends: user.friends.length,
+              allUtilisateur : allUser,
+              allChatUser : allChats
+              });
+            } else {
+              res.redirect('/')
+            }
+          }
+        });
+      })
+    })
+  });  
+
+/****************ROUTE ADMIN*********************/ 
+
+
+/****************ROUTE PAGE PRINCIPAL*********************/ 
 apiRoutes.route('/dash')
   .get(function(req, res){
   Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -203,6 +253,7 @@ apiRoutes.route('/dash')
        }
     });
   })
+/****************ROUTE CREATION POSTS*********************/   
   .post(upload.single('file'),function(req,res){
     var date = new Date();
     var datePost = date.toLocaleString(); 
@@ -239,7 +290,7 @@ apiRoutes.route('/dash')
   })
 
 
-
+/****************ROUTE LES POSTS DE L'USER*********************/  
 apiRoutes.route('/mydash')
   .get(function(req, res){
   Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -265,6 +316,7 @@ apiRoutes.route('/mydash')
   });
 })
 
+/****************ROUTE DELETE DE POST*********************/  
 apiRoutes.route('/post/:_id')
   .get(function(req,res){
     Post.findById(req.params._id, function(err,post) {
@@ -276,6 +328,7 @@ apiRoutes.route('/post/:_id')
       }
     })
   })
+/****************ROUTE MODIFIER LE POST*********************/  
   .post(upload.single('recfile'),function(req,res){
     Post.findById(req.params._id, function(err,posts){
       if(err){
@@ -304,58 +357,8 @@ apiRoutes.route('/post/:_id')
      }
     })
   })
-//////ddfdfd///////
-apiRoutes.route('/comments/:_id')
-  .post(function(req,res){
-    Users.findOne({pseudo:req.session.pseudo},function(err,user){
-      if(err){
-        throw err;
-      } else {
-        var date = new Date();
-        var datePost = date.toLocaleString();
-        console.log(req.params._id);
-        Post.findByIdAndUpdate(
-        req.params._id,
-        {$push: {comments: {
-          auteur : req.session.pseudo,
-          texte : req.body.textComment,
-          date : datePost,
-          srcPhotoUser : user.srcfile
-        }}},
-        {safe: true, upsert: true, new : true},
-        function(err, model) {
-          if(err){
-          console.log(err);
-          }
-        }
-        );   
-        res.redirect('/dash'); 
-      }
-    }) 
-  })
-  
 
-/*apiRoutes.route('/comments/:_id')
-  .post(function(req,res){
-    Users.findOne({pseudo:req.session.pseudo},function(err,user){
-          var date = new Date();
-          var datePost = date.toLocaleString();
-          Post.findByIdAndUpdate(
-          req.params._id,
-          {$push: {comments: [{
-            auteur : req.session.pseudo,
-            texte : req.body.textComment,
-            date : datePost,
-            srcPhotoUser : user.srcfile
-          }]}},
-          {safe: true, upsert: true, new : true},
-          function(err, model) {
-              console.log(err);
-          }
-          );    
-    }) 
-  })*/
-
+/****************ROUTE PROFIL USER CONNECTER*********************/  
   apiRoutes.route('/profil')
     .get(function(req,res){
       Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -381,6 +384,7 @@ apiRoutes.route('/comments/:_id')
         }
       });      
     })
+/****************ROUTE MODIFIER PROFIL USER CONNECTER*********************/     
     .post(function(req,res){
       Users.find({},function(err,allUser){
         Users.findOne({pseudo: req.session.pseudo}, function(err,user){
@@ -393,7 +397,6 @@ apiRoutes.route('/comments/:_id')
             user.pseudo = req.body.pseudo;
             user.password = req.body.password;
             user.email = req.body.email;
-            //user.srcfile = target_path;
             user.presentation = req.body.present;
             user.save(function(err) {
               if(err) {
@@ -406,7 +409,7 @@ apiRoutes.route('/comments/:_id')
         })
       })
     })
-
+/****************ROUTE PROFIL PUBLIC PAS AMIS OU AMIS*********************/ 
   apiRoutes.route('/profilPublic/:_id')
   .get(function(req,res){
     Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -418,8 +421,11 @@ apiRoutes.route('/comments/:_id')
             if(err) {
               throw err;
             } else {
+              if(user.pseudo === userPublic.pseudo){
+                res.redirect('/profil');
+              }
            //   for(var i = 0; i<user.friends.length;i++){
-                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1 || user.friends.map(e => e.status).indexOf('Amis') === -1 ){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
+                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1 || user.role === 1){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
                   res.render('profilFriends',{
                     userFriend:user.friends,  
                     pseudo:user.pseudo,
@@ -457,6 +463,7 @@ apiRoutes.route('/comments/:_id')
       }
     })
   })
+/****************ROUTE INVITATION AMIS *********************/   
   .post(function(req,res){
     Users.findById(req.params._id,function(err,userPublicInvite){
       Users.findOne({pseudo:req.session.pseudo},function(err,user){
@@ -504,6 +511,7 @@ apiRoutes.route('/comments/:_id')
     }); 
   })
 
+/****************ROUTE VALIDATION PAR MAIL POUR AMIS *********************/ 
   apiRoutes.route('/validInvite/:_id')
     .get(function(req,res){
       Users.findById(req.params._id,function(err,userPublicInvite){
@@ -558,7 +566,7 @@ apiRoutes.route('/comments/:_id')
       });
     });
 
-    
+/****************ROUTE LISTE DES AMIS *********************/     
   apiRoutes.route('/friends')
     .get(function(req, res){
     Users.findOne({pseudo: req.session.pseudo},function(err,user){
@@ -575,31 +583,32 @@ apiRoutes.route('/comments/:_id')
     });
   });
 
-
-apiRoutes.route('/deleteMessages/:_id')
+/****************ROUTE DELETE MESSAGES PRIVEES USER CONNECTER*********************/ 
+  apiRoutes.route('/deleteMessages/:_id')
     .get(function(req,res){
-        Users.findOne({pseudo:req.session.pseudo}, function(err,result) {
-          if(err) {
-            throw err;
-          } else {
-            for(var i=0; i < result.messages.length; i++){
-              console.log(result.messages[i]._id);
-              if(result.messages[i]._id == req.params._id){
-                console.log('oui')
-                result.messages.id(req.params._id).remove();
-                result.save(function (err) {
-                  if (err) return handleError(err);
+      Users.findOne({pseudo:req.session.pseudo}, function(err,result) {
+        if(err) {
+          throw err;
+        } else {
+          for(var i=0; i < result.messages.length; i++){
+            console.log(result.messages[i]._id);
+            if(result.messages[i]._id == req.params._id){
+              console.log('oui')
+              result.messages.id(req.params._id).remove();
+              result.save(function (err) {
+                if (err) return handleError(err);
                   console.log('the sub-doc was removed')
-                });      
-              }
+              });      
+            }
           }
           io.emit('displayMess',result.messages);
           io.emit('displayMessPublic',result.messages);
           res.send(result);
-          }          
-        })
-    })   
+        }          
+      })
+    });
 
+/****************ROUTE POSTER MESSAGE AMIS *********************/ 
   apiRoutes.route('/postMessage/:_id')
   .post(function(req,res){
     Users.findOne({pseudo:req.session.pseudo},function(err,user){
@@ -617,17 +626,12 @@ apiRoutes.route('/deleteMessages/:_id')
           {_id: userFriends._id},
           {$push: {messages: mess}},
           {safe: true, upsert: true, new:true, sort:{messages:-1}},
-          function(err, model) {
-            console.log('ici audrey' + model);
-           /* model.messages.sort(function (a,b) {
-            return b.date - a.date ;
-            });  */          
+          function(err, model) {       
             io.emit('displayMess',model.messages);
             io.emit('displayMessPublic',model.messages);
             console.log(err);
             if(model.pseudo === user.pseudo){
               Users.distinct('admin', function(error, results){
-                console.log('distinct value' + results);
               });
               return
             } else {
@@ -635,7 +639,7 @@ apiRoutes.route('/deleteMessages/:_id')
               from: "WriteItSocial@gmail.com",
                 to: userFriends.email,
                   subject: user.pseudo + " Vous à envoyé un message " ,
-                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce massage dans votre espace message</h2></div>"
+                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce message dans votre espace message</h2></div>"
               }
               smtpTransport.sendMail(mailMdpLost, function(error, response){
                 if(error){
@@ -652,7 +656,7 @@ apiRoutes.route('/deleteMessages/:_id')
       });
     });
   })
-
+/****************ROUTE DELETE PROFIL *********************/ 
   apiRoutes.route('/deleteProfil/:_id')
     .get(function(req,res){
       Users.findById(req.params._id, function(err,user) {
@@ -666,6 +670,8 @@ apiRoutes.route('/deleteMessages/:_id')
     })
 
 //#################################
+
+/****************ROUTE POUR LES CHATS AVANT CONNEXION *********************/ 
   apiRoutes.route('/chat')
     .get(function(req,res){
       Chats.find({hote:req.session.pseudo},function(err,userChats){
@@ -690,6 +696,7 @@ apiRoutes.route('/deleteMessages/:_id')
         }
       });
     })
+/****************ROUTE CREATION CHAT CONNECTER*********************/     
     .post(function(req,res){
       Users.findOne({pseudo:req.session.pseudo},function(err,user){
         if(err){
@@ -713,11 +720,11 @@ apiRoutes.route('/deleteMessages/:_id')
       });
     })
 
-
+/****************ROUTE REJOINDRE CHAT AVEC VERIFICATION SI C LA PERSONNE EST DEJA VENU DANS LA SESSION ET SI USER CONNECTER
+ * EST L HOTE IL N'EST PAS AJOUTER A LA LISTE DES PARTICIPANTS AVEC ENVOIS D'UN MAIL A L'HOTE SI UNE PERSONNE INVITER REJOINS LE CHAT *********************/ 
   apiRoutes.route('/chat/:_id')
     .get(function(req,res){
       Chats.findById(req.params._id,function(err,chatSession){
-        //console.log(req.params._id);
         if(err){
           console.log('error find Chat session route /chat:_id .get');
         } else {
@@ -777,10 +784,10 @@ apiRoutes.route('/deleteMessages/:_id')
         }
       });
     })
+/****************ROUTE POSTER MESSAGE SUR LA ROOM CHAT*********************/     
     .post(function(req,res){
         Users.findOne({pseudo:req.session.pseudo},function(err,user){
           Chats.findById(req.params._id,function(err,chatSession){
-            console.log(chatSession._id)
             var date = new Date();
             var dateMessageChat = date.toLocaleString(); 
             mess = 
@@ -795,14 +802,26 @@ apiRoutes.route('/deleteMessages/:_id')
               {$push: {messages: mess}},
               {safe: true, upsert: true, new:true, sort:{messages:-1}},
               function(err, model) {      
-                io.emit('displayMessageSession',model.messages);
-                console.log(err);
-              }
-            );      
-          });
+              io.emit('displayMessageSession',model.messages);
+              console.log(err);
+            }
+          );      
         });
+      });
+    })
+/****************ROUTE DELETE CHAT *********************/ 
+    apiRoutes.route('/deleteChat/:_id')
+      .get(function(req,res){
+        Chats.findById(req.params._id, function(err,chat) {
+          if(err) {
+            throw err;
+          } else {
+            chat.remove({});
+            res.redirect('/chat');
+          }
+        })
       })
-
+/****************ROUTE INVITATION AUX AMIS DE REJOINDRE LE CHAT*********************/ 
   apiRoutes.route('/inviteChat/:_id')
     .post(function(req,res){
       Users.findOne({pseudo:req.session.pseudo},function(err,user){
@@ -810,7 +829,6 @@ apiRoutes.route('/deleteMessages/:_id')
           console.log('error find user session route /chat:_id .put');
         } else {
           Users.findById(req.params._id,function(err,userFriends){
-            console.log('LALALLALA'+userFriends._id)
             if(err){
               console.log('error find Chat session route /chat:_id .put');
             } else {
@@ -827,7 +845,6 @@ apiRoutes.route('/deleteMessages/:_id')
                   {$push: {invitationChat: inviteChat}},
                   {safe: true, upsert: true, new:true},
                   function(err, model) {  
-                    io.emit('dislayInviteChat',model)
                 }); 
                 var mailMdpLost = {
                 from: "WriteItSocial@gmail.com",
@@ -848,8 +865,17 @@ apiRoutes.route('/deleteMessages/:_id')
           })
         }
       })
+    });
+
+
+/****************ROUTE DECONNEXION*********************/       
+    apiRoutes.route('/deconnexion')  
+    .get(function(req,res){
+      req.session.destroy(function(err) {
+        req.token = null;
+        res.redirect('/');
+      })
     })
-      
 
 
 
@@ -862,46 +888,52 @@ apiRoutes.route('/deleteMessages/:_id')
   // Compteur live Server //
   var countLive = 0;
   io.on('connection', function (socket) {
-  countLive = countLive + 1;
+    countLive = countLive + 1;
 
   //Compteur connect
-  
     io.emit('usersLiveCount',countLive)
       console.log('a user connected');
 
-      socket.on('disconnect', function () {
-        countLive = countLive - 1;
-        io.emit('usersLiveCount',countLive)
-        console.log('user disconnected');
+    socket.on('disconnect', function () {
+      countLive = countLive - 1;
+      io.emit('usersLiveCount',countLive)
+      console.log('user disconnected');
+    });
 
-      });
   //Compteur number log
-        Users.find({}).count(function(err,result){
-          if(err){
-            console.log('error find Users for count error')
+    Users.find({}).count(function(err,result){
+      if(err){
+        console.log('error find Users for count error')
+      } else if(result){
+        io.emit('usersCountLog', result);
+      }
+    });
 
-          } else if(result){
-            io.emit('usersCountLog', result);
-          }
-        });
   //Compteur post
-        Post.find({}).count(function(err,result){
-          if(err){
-            console.log('error find PostIts for count error')
+    Post.find({}).count(function(err,result){
+      if(err){
+        console.log('error find PostIts for count error')
+      } else if(result){
+        io.emit('postItsCountLog', result);
+      }
+    });
 
-          } else if(result){
-            io.emit('postItsCountLog', result);
-          }
-        });
 
-  // Compteur live Server ends //  
-
+  //Compteur post
+    Chats.find({}).count(function(err,result){
+      if(err){
+        console.log('error find PostIts for count error')
+      } else if(result){
+        io.emit('chatCount', result);
+      }
+    });    
+  
+  
   // all post affichage // 
-        Post.find({}).sort([['date', -1]]).exec(function(err, docs) {
-          io.emit('allPostDisplay',docs);
-        });
+    Post.find({}).sort([['date', -1]]).exec(function(err, docs) {
+      io.emit('allPostDisplay',docs);
+    });
   // all post affichage ends // 
-
 
 
 
@@ -919,231 +951,5 @@ apiRoutes.route('/deleteMessages/:_id')
     });
   // search bar ends //
   });
-
-
-
-
-
 return apiRoutes;
 };
-
-
-
-
-
-
-
-
-
-/*
-exports.post = function(req, res) {
-  var tmp_path = req.file.path
-  var target_path = 'uploads/' + req.file.originalname;
-  var src = fs.createReadStream(tmp_path);
-  var dest = fs.createWriteStream(target_path);
-  src.pipe(dest);
-  new Users({
-    genre: req.body.genre,
-    age: req.body.age,
-    prenom: req.body.prenom,
-    nom : req.body.nom,
-    pseudo: req.body.pseudo,
-    password: req.body.password,
-    email: req.body.email,
-    srcfile:target_path,
-    presentation: req.body.present,
-    role:2,
-    friends:[
-     {
-      pseudo:null,
-      srcfile:null
-     }
-  ]}).save();
-}
-*/
-exports.list = function(req, res) {
-  Users.find(function(err, users) {
-    res.send(users);
-  });
-}
-
-// first locates a thread by title, then locates the replies by thread ID.
-exports.show = (function(req, res) {
-    Users.findOne({pseudo: req.params.pseudo}, function(error, users) {
-      console.log(users)
-        //var posts = Post.find({thread: thread._id}, function(error, posts) {
-          res.send([{Users: users}]);
-        //});
-    })
-});;
-
-/*
-app.post('/inscription',upload.single('recfile'),function(req,res){
-  collectionUsers.findOne({pseudo: req.body.pseudo},function(err, result) {
-    if(err){
-      console.log('error find collection /inscription'.error)
-    } else {
-      if(result){
-        var pseudoExisted = 'Ce pseudo existe deja !';
-        res.render('inscription',{pseudoExist:pseudoExisted});
-      } else {
-        var tmp_path = req.file.path
-        var target_path = 'uploads/' + req.file.originalname;
-        var src = fs.createReadStream(tmp_path);
-        var dest = fs.createWriteStream(target_path);
-        src.pipe(dest);
-        collectionUsers.insertOne({
-          genre: req.body.genre,
-          age: req.body.age,
-          prenom: req.body.prenom,
-          nom : req.body.nom,
-          pseudo: req.body.pseudo,
-          password: req.body.password,
-          email: req.body.email,
-          srcfile:target_path,
-          presentation: req.body.present,
-          role:2,
-          friends:[
-          {
-            pseudo:"",
-            srcfile:""
-          }
-        ]}, function(err, result) { 
-          req.session.prenom = req.body.prenom;
-          req.session.nom = req.body.nom;
-          req.session.pseudo = req.body.pseudo;
-          req.session.srcfile = 'uploads/' + req.file.originalname;
-          res.redirect('/dash');
-        });
-      }
-    }
-  })
-});
-
-/////////////test /////////////
-
-
- routeur.route('/')
-    .get(function(req,res){
-      res.render('index');
-    })
-
-
-  routeur.get('/users', function(req, res) {
-    Users.find({}, function(err, users) {
-     res.json(users);
-    });
-  });       
-
-  routeur.route('/index')
-    .get(function(req,res){
-      res.render('index')
-    })
-    .post(function(req,res){
-      if(!req.body.pseudo){
-        res.status(400).send('pseudo required');
-        return;
-      }
-      if(!req.body.password){
-        res.status(400).send('password required');
-        return;
-      }
-      Users.findOne({pseudo:req.body.pseudo},function(err,user){
-        if(err){
-          throw err;
-          res.redirect('/')
-        } else {
-          var myToken = jwt.sign({
-          pseudo:req.body.pseudo,
-          password:req.body.password
-          },mySecret,{ expiresIn: '24h' }); //Expire au bout de 24h, une nouvelle authentification sera nécessaire);
-          res.redirect('dash');
-          console.log(myToken);
-          console.log(user);
-        }
-      })
-
-    })
-
-
-  routeur.route('/inscription')
-    .get(function(req,res){
-      res.render('inscription');
-    })
-    .post(upload.single('recfile'),function(req,res){
-      var tmp_path = req.file.path
-      var target_path = 'uploads/' + req.file.originalname;
-      var src = fs.createReadStream(tmp_path);
-      var dest = fs.createWriteStream(target_path);
-      src.pipe(dest);
-      var users = new Users();
-        users.genre = req.body.genre;
-        users.age = req.body.age;
-        users.prenom = req.body.prenom;
-        users.nom = req.body.nom;
-        users.pseudo = req.body.pseudo;
-        users.password = req.body.password;
-        users.email = req.body.email;
-        users.srcfile = target_path;
-        users.presentation = req.body.present;
-        users.friends = [
-        {
-          pseudo:null,
-          srcfile:null
-        }]
-      users.save(function(err){
-        var usersPseudo = Users.findOne({pseudo:users.pseudo})
-        if(usersPseudo) { //Nous permet de vérifier si un utilisateur existe déjà
-            res.render('inscription',{message: 'Un utilisateur avec ce nom d\'utilisateur existe déjà.'});
-        } else {
-          res.redirect('dash',users);
-        }
-      })
-    })
-
-
-
-
-routeur.route('/dash')
-  .get(function(req,res){
-    var myToken = req.body.token || req.query.token || req.headers['x-access-token'];
-    if(myToken){
-      jwt.verify(myToken, mySecret, function(err, decoded) {
-        if(err) {
-          //On va envoyer une réponse http avec le code 403 (accès refusé) et un message d'erreur
-          return res.status(403).send({
-            success: false,
-            message: 'Echec à authentifier le token'
-          });
-        } else {//Fin de if(err)
-        
-          //Si la signature passé en argument est correcte on va pouvoir aller à la prochaine route
-          //On va stocker notre payload (les informations) décoder dans la requête pour être utiliser dans les prochaines routes
-
-          req.decoded = decoded;
-
-
-          //L'utilisateur peut aller plus loin seulement si il fournis un token et que celui ci est vérifié
-          Users.findOne({pseudo:req.body.pseudo},function(err,user){
-            res.render('dash',user)
-          })
-
-        } //Fin du else
-
-      });      
-    }
-    
-  })    
-
-
-
-
-
-
-
-
-
-
-*/
-
-

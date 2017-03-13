@@ -20,20 +20,20 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='index')
+            a.navbar-brand(href='dash')
               img(src='logo-navbar.png',alt='logo')  
           #bs-example-navbar-collapse-1.navbar-collapse.collapse
             ul.nav.navbar-nav.navbar-right.main-menu
               li.dropdown
                 a(href='dash')|Home
               li.dropdown
-                a(href='#')|À propos
-              li.dropdown
                 a(href='profil')|Profil
               li.dropdown
-                a(href='#')|Chat
+                a(href='chat')|Chat
               li.dropdown
-                a(href='#')|Mentions légales
+                a(href='aPropos')|À propos
+              li.dropdown
+                a(href='/deconnexion')|Déconnexion 
             form.navbar-form.navbar-right.hidden-sm.form-search-bar
               .form-group
                 i.icon.fi-magnifying-glass
@@ -60,27 +60,27 @@ html
               li
                 i.icon.fi-torsos-all
                 div
-                  a(href='profil')
+                  a(href='friends')
                     | Mes amis  
               li
                 i.icon.fi-comments
                 div
-                  a(href='#')
-                    | Messages   
+                  a(href='profil')
+                    | Profil / Messages   
               li
-                i.icon.fi-photo
+                i.icon.fi-comments
                 div
-                  a(href='#')
-                    | Photos
-            #chat-block
+                  a(href='chat')
+                    | Chat
+            #chat-block.hidden-sm.hidden-xs
               div.title
-                |Chat online
+                |Les utilisateurs
               ul.online-users.list-inline
                 each divImgFriend in scrFileFriend
                   li
-                    a(href='#')
+                    a(href='/profilPublic/' + divImgFriend._id)
                       img.img-responsive.profile-photo(src=divImgFriend.srcfile,title=divImgFriend.pseudo) 
-          .col-md-7
+          .col-md-9
             .create-post
               .row
                 .col-md-7.col-sm-7
@@ -130,6 +130,7 @@ html
     script(type='text/javascript', src='socket.io.js')
     script(type='text/javascript', src='socketClient.js')
     script(type='text/javascript', src='jqueryBlog.js')
+    script(type='text/javascript', src='main_js_dash.js')
 
 
       

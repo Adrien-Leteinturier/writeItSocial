@@ -20,18 +20,20 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='dash')
+            a.navbar-brand(href='admin')
               img(src='logo-navbar.png',alt='logo')  
           #bs-example-navbar-collapse-1.navbar-collapse.collapse
             ul.nav.navbar-nav.navbar-right.main-menu
               li.dropdown
-                a(href='dash')|Home
+                a(href='admin')|Home
               li.dropdown
                 a(href='profil')|Profil
               li.dropdown
                 a(href='chat')|Chat
               li.dropdown
                 a(href='aPropos')|À propos
+              li.dropdown
+                a(href='mentionLegales')|Mentions légales
               li.dropdown
                 a(href='/deconnexion')|Déconnexion 
             form.navbar-form.navbar-right.hidden-sm.form-search-bar
@@ -60,7 +62,7 @@ html
               li
                 i.icon.fi-torsos-all
                 div
-                  a(href='profil')
+                  a(href='friends')
                     | Mes amis  
               li
                 i.icon.fi-comments
@@ -82,12 +84,9 @@ html
                       img.img-responsive.profile-photo(src=divImgFriend.srcfile,title=divImgFriend.pseudo) 
           .col-md-9
             .head-public-profil.no-padding.text-center
-            .row
+            .row.no-margin
               .col-md-12.col-sm-12.col-xs-12.text-center
-                button.btn.btn-primary#crossInvite(type='button')          
-                  i.fi-plus
-            #divChatParent
-              each dipslayChatsUser in listUserChats
+              each dipslayChatsUser in allChatUser
                 .row.no-margin.contentChatsDisplay.text-center
                   .col-md-4.col-sm-4.col-xs-4
                     img.img-profile-messages.imgPostDisplayFriends(src=dipslayChatsUser.srcfile)
@@ -102,24 +101,34 @@ html
                       i.fi-arrow-up            
                     a#deleteChat(href="/deleteChat/" + dipslayChatsUser._id)               
                       i.fi-trash
-            .contentMessages.text-center
-              p| Invitations chat
-              each dipslayInviteChat in userListInviteChat
-                .row.no-margin.contentChatsDisplay.text-center
-                  .col-md-4.col-sm-4.col-xs-4
-                    img.img-profile-messages.imgPostDisplayFriends(src=dipslayInviteChat.srcfile)
-                  .col-md-2.col-sm-2.col-xs-2
-                    h3| Hote 
-                    p=dipslayInviteChat.hote  
-                  .col-md-2.col-sm-2.col-xs-2  
-                    a(href="/chat/" + dipslayInviteChat.url)        
-                      i.fi-arrow-up                
+          .col-md-2.text-center.hidden-xs
+            ul.compteurLive-list#compteurAdmin
+                li
+                .compteurLive-icon
+                    i.fi-torsos-male-female
+                h3.valueLogin
+                p|Personnes inscrites
+                li
+                .compteurLive-icon
+                    i.fi-photo
+                h3.valuePost
+                p|Posts publiés
+                li
+                .compteurLive-icon
+                    i.fi-check
+                h3.valueConnect
+                p|Personnes connectés
+                li
+                .compteurLive-icon
+                    i.fi-comments
+                h3.valueConnect
+                p|Chats crées                                      
     section#footer
       #containerIndex
         .row
           #footer-wrapper
             .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
-              a(href='index',alt='Home')
+              a(href='admin',alt='Home')
                 img#logoFooter(src='logo-footer.png')
               ul.socialList
                 li
@@ -152,7 +161,7 @@ html
     script(type='text/javascript', src='socket.io.js')
     script(type='text/javascript', src='socketClient.js')
     script(type='text/javascript', src='jqueryBlog.js')
-    script(type='text/javascript', src='main_js_dash.js')
+    script(type='text/javascript', src='main_js_dash.js')  
 
 
       

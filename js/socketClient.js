@@ -17,7 +17,13 @@
         socket.on('postItsCountLog', function (data) {
             $('.valuePost').html(data);
         });
+        socket.on('chatCount', function (data) {
+            $('.valueConnect').html(data);
+        });
+
+        
 /*------------------Count reel Time ends---------------------*/
+
 
 /*------------------List friends---------------------*/
 
@@ -30,24 +36,15 @@
 
 /*------------------List all Post---------------------*/
    socket.on('allPostDisplay',function(data){
-       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
-        //$('#comment').empty();
         $('#parentDiv').empty();
         for(var i = 0; i<data.length; i++){
             if(!data[i].srcfile){
-                let html = ('<div class="parent-div-post-content"><div class="post-content"><div class="post-container"><img src='+'"'+ data[i].srcPhotoUser +'"'+'alt="user" class="profile-photo-md pull-left" id="post-author-image"><div class="post-detail"><div class="user-info"><h5><a href="timeline.html" class="profile-link" id="name-user-post">'+ data[i].auteur +'</a><p id="date-post">'+ data[i].date +'</p></div><div class="reaction"></div><div class="line-divider"></div><div id="post-text"><p>'+ data[i].texte +'</p></div><form class="post-comment" method="POST" action="/comments/' + data[i]._id +'"><input type="text" class="form-control" name="textComment" placeholder="Post a comment"></form></div></div></div></div>')
+                let html = ('<div class="parent-div-post-content"><div class="post-content"><div class="post-container"><img src='+'"'+ data[i].srcPhotoUser +'"'+'alt="user" class="profile-photo-md pull-left" id="post-author-image"><div class="post-detail"><div class="user-info"><h5><a href="timeline.html" class="profile-link" id="name-user-post">'+ data[i].auteur +'</a><p id="date-post">'+ data[i].date +'</p></div><div class="reaction"></div><div class="line-divider"></div><div id="post-text"><p>'+ data[i].texte +'</p></div</div></div></div></div>')
                 $('#parentDiv').append(html);
             } else {
-                let html = ('<div class="parent-div-post-content"><div class="post-content"><img src='+ '"'+ data[i].srcfile + '"' +'alt="post-image" id="post-image"><div class="post-container"><img src='+'"'+ data[i].srcPhotoUser +'"'+'alt="user" class="profile-photo-md pull-left" id="post-author-image"><div class="post-detail"><div class="user-info"><h5><a href="timeline.html" class="profile-link" id="name-user-post">'+ data[i].auteur +'</a><p id="date-post">'+ data[i].date +'</p></div><div class="reaction"></div><div class="line-divider"></div><div id="post-text"><p>'+ data[i].texte +'</p></div><form class="post-comment" method="POST" action="/comments/' + data[i]._id +'"><input type="text" class="form-control" name="textComment" placeholder="Post a comment"></form></div></div></div></div>')
+                let html = ('<div class="parent-div-post-content"><div class="post-content"><img src='+ '"'+ data[i].srcfile + '"' +'alt="post-image" id="post-image"><div class="post-container"><img src='+'"'+ data[i].srcPhotoUser +'"'+'alt="user" class="profile-photo-md pull-left" id="post-author-image"><div class="post-detail"><div class="user-info"><h5><a href="timeline.html" class="profile-link" id="name-user-post">'+ data[i].auteur +'</a><p id="date-post">'+ data[i].date +'</p></div><div class="reaction"></div><div class="line-divider"></div><div id="post-text"><p>'+ data[i].texte +'</p></div></div></div></div></div>')
                 $('#parentDiv').append(html);                
             }
-
-           // if(data[i].comments){
-                for(var j = 0; j<data[i].comments.length; j++){
-                let comment = ('<div id="comment"><img src='+ data[i].comments[j].srcPhotoUser +' alt="" class="profile-photo-sm"><p class="auteurAndTexteComment"><a href="#" class="profile-link">'+ data[i].comments[j].auteur +'</a>'+' '+ data[i].comments[j].texte + '</p></div>')
-                $('.post-detail').append(comment);
-                }
-          //  }
         }
     });
     
@@ -56,9 +53,6 @@
 
 /*------------------Display messages profil Friends---------------------*/
    socket.on('displayMess',function(data){
-       console.log('ici audrey' + data)
-       $('head').append('<meta http-equiv="X-UA-Compatible" content="IE=Edge" /><meta property="og:url" content="http://writeIt.ddns.net" /><meta property="og:type" content="WriteItSocial" /><meta property="og:title" content="Adrien Leteinturier - Write It Social" /><meta property="og:description"   content="Your description" /><meta property="og:image" content="logo-footer.png" />');
-       
         $('#parentDivMessage').empty();
         for(var i = 0; i<data.length; i++){
             console.log(data[i].pseudo)
@@ -101,162 +95,118 @@
         }
     });        
 
-/*------------------Display Invitation Chat Session  ---------------------*/
-   socket.on('dislayInviteChat',function(data){
-       console.log(data);
-        $('#divInviteChatParent').empty();
-        for(var i = 0; i<data.length; i++){
-           let htmlInvitChat = ('<div class="row no-margin contentChatsDisplay text-center"><div class="col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-md-8 col-sm-8 col-xs-8"><img class="img-profile-messages imgPostDisplayFriends" src="../'+ data[i].srcfile +'" /><p>'+ data[i].hote +'<p/><a href="/chat/' + data[i]._id + '"><i class="fi-arrow-up"></i></a><i class="fi-trash"></i></div></div>')                    
-           $('#divInviteChatParent').append(htmlInvitChat);
-        }
-    });          
 
 
 
 /*------------------Search bar-------------------------*/
-        $('.form-search-bar').submit(function(event){
-            event.preventDefault();
-        });
+    $('.form-search-bar').submit(function(event){
+        event.preventDefault();
+    });
 
-        $('.search-bar').on('change',function(){
-            var valSearch = $('.search-bar').val()
-            socket.emit('searchBar',valSearch);
-        });
-
-        socket.on('returnSearch',function(data){
-            console.log(data.users[0]);
-            $('#resultSearch').empty();
-            for(var i = 0; i<data.users.length;i++){
-                let htmlSearch = ('<div class="col-md-2 result-post"><a href="/profilPublic/'+ data.users[i]._id +'" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="../'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
+    $('.search-bar').on('change',function(){
+        var valSearch = $('.search-bar').val()
+        socket.emit('searchBar',valSearch);
+    });
+    socket.on('returnSearch',function(data){
+        console.log(data.users[0]);
+        $('#resultSearch').empty();
+        for(var i = 0; i<data.users.length;i++){
+            let htmlSearch = ('<div class="col-md-2 result-post"><a href="/profilPublic/'+ data.users[i]._id +'" alt="'+ data.users[i].pseudo +'" title="'+ data.users[i].pseudo +'"><img class="profile-photo-md" src="../'+ data.users[i].srcfile +'" alt="profile photo md"></a><a href="#" alt="'+ data.users[i].pseudo +'"><p>'+ data.users[i].pseudo +'</p></a></div>')
             $('#resultSearch').append(htmlSearch);
-            }
-            if($('.search-bar').val() === ''){
-                $('#resultSearch').empty();
-            }
-        });
+        }
+        if($('.search-bar').val() === ''){
+            $('#resultSearch').empty();
+        }
+    });
 /*------------------Search bar end---------------------*/
-
-
-
-/*------------------Ajax signUp prevent---------------*/
-$('#floginForm').submit(function(event) {
-    event.preventDefault();
-  var data = new FormData(this);
-    console.log(data)
-
-    $.ajax({
-        method: 'POST',
-        url: '/inscription',
-        contentType: false,
-        processData: false,
-        data: data
-    }).done(function(result) {
-        $('.button-inscription').notify(
-        'Félcicitations votre inscription est validée !', 
-        { position:'bottom' }
-        );        
-    })
-});
 
 
 /*-----------------Ajax Create Post-------------------------*/
  
-$('#form-create-post').submit(function(event) {
-    event.preventDefault();
-    var data = new FormData(this);
-    $.ajax({
-        method: 'POST',
-        url: '/dash',
-        contentType: false,
-        processData: false,
-        data: data
-    }).done(function(result) {
-    })
-    $('#create-post-textarea').val('');
-    $('#file').val('');
-});
+    $('#form-create-post').submit(function(event) {
+        event.preventDefault();
+        var data = new FormData(this);
+        $.ajax({
+            method: 'POST',
+            url: '/dash',
+            contentType: false,
+            processData: false,
+            data: data
+        }).done(function(result) {
+        })
+        $('#create-post-textarea').val('');
+        $('#file').val('');
+    });
 
 /*-----------------Ajax Create message profil-------------------------*/
 
-$('#form-message-post').submit(function(event) {
-    event.preventDefault();
-  //  var file =  $('#file')[0].files[0];
-    var data = {
-        'messagePost': $('#create-message-textarea').val()
-    };
-    var url = $("#form-message-post").attr('action');
-    console.log(url);
-
-
-    $.ajax({
-        method: 'POST',
-        url: url,
-        data: data
-    }).done(function(result) {
-        alert('Message envoyé avec succés');
-    })
-    $('#create-message-textarea').val('')
-});
+    $('#form-message-post').submit(function(event) {
+        event.preventDefault();
+        var data = {
+            'messagePost': $('#create-message-textarea').val()
+        };
+        var url = $("#form-message-post").attr('action');
+        $.ajax({
+            method: 'POST',
+            url: url,
+            data: data
+        }).done(function(result) {
+            alert('Message envoyé avec succés');
+        })
+        $('#create-message-textarea').val('')
+    });
 
 
 /*-----------------Ajax delete message-------------------------*/
 
-$(document).on('click','.deleteMess', function() {
-    console.log('click');
-    var url = '/deleteMessages/' + $(this).attr('data-id');
-    console.log(url);
-    $.ajax({
-        method: 'GET',
-        url: url
-    }).done(function(result) {
-        console.log('Message supprimer');
-    })
-});
-
-
-
-
+    $(document).on('click','.deleteMess', function() {
+        console.log('click');
+        var url = '/deleteMessages/' + $(this).attr('data-id');
+        console.log(url);
+        $.ajax({
+            method: 'GET',
+            url: url
+        }).done(function(result) {
+            console.log('Message supprimer');
+        })
+    });
 
 /*-----------------Ajax create chat -------------------------*/
-$('#crossInvite').on('click',function(){
-    console.log('click cross');
-    $.ajax({
-        method:'POST',
-        url: '/chat'
-    }).done(function(result){
-        console.log('Session chat creer !')
-        location.reload(true);
+    $('#crossInvite').on('click',function(){
+        console.log('click cross');
+        $.ajax({
+            method:'POST',
+            url: '/chat'
+        }).done(function(result){
+            console.log('Session chat creer !')
+            location.reload(true);
+        })
     })
-})
 
 /*-----------------Ajax message chat -------------------------*/
-$('#form-create-message-chat').submit(function(event) {
-    
-    event.preventDefault();
-    var url = $('#form-create-message-chat').attr('action');
-    var data = {
-        'messageChat': $('.input-message-chat').val()
-    };    
-    console.log($('.input-message-chat').val());
-    console.log(url);
-    $.ajax({
-        method: 'POST',
-        url: url,
-        data: data
-    }).done(function(result) {
-    })
-    $('.input-message-chat').val('')
-});
+    $('#form-create-message-chat').submit(function(event) {
+        event.preventDefault();
+        var url = $('#form-create-message-chat').attr('action');
+        var data = {
+            'messageChat': $('.input-message-chat').val()
+        };    
+        $.ajax({
+            method: 'POST',
+            url: url,
+            data: data
+        }).done(function(result) {
+        })
+        $('.input-message-chat').val('')
+    });
 
-/*-----------------Ajax invite chat -------------------------*/
-$('#inviteFriendsChat').click(function(event) {
-    
+/*-----------------Ajax invitation chat -------------------------*/
+    $('#inviteFriendsChat').click(function(event) {
     event.preventDefault();
-    var url = $('#inviteFriendsChat').attr('action');
+    alert('Invitation envoyé avec succes')
+    var url = $('#inviteFriendsChat').attr('href');
     var data = {
         'urlChat': $('#inviteFriendsChat').attr('data-id')
     };    
-    console.log(data)
     $.ajax({
         method: 'POST',
         url: url,
@@ -264,8 +214,6 @@ $('#inviteFriendsChat').click(function(event) {
     }).done(function(result) {
     })
 });
-
-
 
 
 

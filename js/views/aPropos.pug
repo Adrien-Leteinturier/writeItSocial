@@ -11,24 +11,13 @@ html
     link(rel='stylesheet', href='style.css')
     link(rel='stylesheet', href='jsUiBase.css')
   body
-    #dialogMail.dialogEmail(title='Erreur !!!')
-      p Veuillez renseignez un E-mail valide
-    section#bannerMdpLost
-      #containerIndex.row
-        .col-sm-12.col-xs-12
-          section#loginForm
-            a(href='/index')
-              img.logo-index(src='logo-index.png')
-            #lineDiviser
-            #formWrapper
-              p.textFormWrapper|Vous avez oublié votre mot de passe ? Entrer votre mail , il vous sera envoyé !
-              form#postMdpLost(method='POST',action='mdpLost')
-                input#email(type='email',name='email',placeholder='Votre e-mail')
-                button#submit.button-connexion.btnSubmit|Envois
-            a.linkInscription(href='inscription', alt='Inscription')|Inscription?
-            a.linkInscription(href='mdpLost',alt='Mot de passe oublier')|Mot de passe oublier?
-            img.formShadow(src='bottom-shadow.png')
-          p=message    
+    section#banner
+      .row
+        .col-md-12.text-center.contentApropos
+          h1| À propos
+          p| Bonjour,
+           | Afin d'obtenir le diplôme de niveau II de développeur Javascript Fullstack.J'ai développé un réseau social en Jade / CSS , bootstrap, Node JS, Express JS, méthode Ajax ( Jquery), Socket.io,  Node Mailer.
+           | Ma formation, renforcée par ma mission de fin d'études, m'a permis d'acquérir et de développer toutes les techniques et méthodes de conception et de développement. J'ai ainsi participé au développement de plusieurs projets web, dans lesquels j'étais en charge de la partie technique, et notamment de la rédaction des lignes de codes nécessaires à la création d'un produit.
     section#footer
       #containerIndex
         .row
@@ -62,13 +51,12 @@ html
                   p.phone| 06-18-33-96-13
                 li
                   i.icon-contact.fi-mail
-                  p.mail| adrienleteinturier@gmail.com
+                  p.mail| adrienleteinturier@gmail.com    
     script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.js')
     script(src='http://code.jquery.com/ui/1.12.0/jquery-ui.min.js', integrity='sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=', crossorigin='anonymous')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')   
     script(type='text/javascript', src='socket.io.js')
     script(type='text/javascript', src='socketClient.js')
-    script(type='text/javascript', src='valid_form.js')
 
-
-  
+    

@@ -20,20 +20,20 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='index')
+            a.navbar-brand(href='dash')
               img(src='../logo-navbar.png',alt='logo')  
           #bs-example-navbar-collapse-1.navbar-collapse.collapse
             ul.nav.navbar-nav.navbar-right.main-menu
               li.dropdown
-                a(href='#')|Home
+                a(href='dash')|Home
               li.dropdown
-                a(href='#')|À propos
+                a(href='profil')|Profil
               li.dropdown
-                a(href='#')|Profil
+                a(href='chat')|Chat
               li.dropdown
-                a(href='#')|Chat
+                a(href='aPropos')|À propos
               li.dropdown
-                a(href='#')|Mentions légales
+                a(href='/deconnexion')|Déconnexion 
             form.navbar-form.navbar-right.hidden-sm.form-search-bar
               .form-group
                 i.icon.fi-magnifying-glass
@@ -55,32 +55,32 @@ html
               li
                 i.icon.fi-page-multiple
                 div
-                  a(href='#')
+                  a(href='mydash')
                     | Mon flux 
               li
                 i.icon.fi-torsos-all
                 div
-                  a(href='#')
+                  a(href='friends')
                     | Mes amis  
               li
                 i.icon.fi-comments
                 div
-                  a(href='#')
-                    | Messages   
+                  a(href='profil')
+                    | Profil / Messages   
               li
-                i.icon.fi-photo
+                i.icon.fi-comments
                 div
-                  a(href='#')
-                    | Photos
-            #chat-block
+                  a(href='chat')
+                    | Chat
+            #chat-block.hidden-sm.hidden-xs
               div.title
-                |Chat online
+                |Mes amis
               ul.online-users.list-inline
                 each divImgFriend in userFriend
                   li
-                    a(href='#')
+                    a(href='/profilPublic/' + divImgFriend._id)
                       img.img-responsive.profile-photo(src='../' + divImgFriend.srcfile,title=divImgFriend.pseudo) 
-          .col-md-7
+          .col-md-9
             .head-public-profil.no-margin.text-center.row
               .col-md-12
                 h3=userPublicPseudo
@@ -133,23 +133,21 @@ html
                     img#logoFooter(src='../logo-footer.png')
                   ul.socialList
                     li
-                      a(href='#',alt='Facebook')
+                      a(href='https://www.facebook.com/AdrienDeveloper/',alt='Facebook')
                         i.iconSocialFooter.fi-social-facebook
                     li
-                      a(href='#',alt='Twitter')
+                      a(href='https://twitter.com/AdrienDeveloper',alt='Twitter')
                         i.iconSocialFooter.fi-social-twitter
                     li
-                      a(href='#',alt='Github')
+                      a(href='https://github.com/Adrien-Leteinturier',alt='Github')
                         i.iconSocialFooter.fi-social-github
                     li
-                      a(href='#',alt='Linkedin')
+                      a(href='https://www.linkedin.com/in/adrien-leteinturier/',alt='Linkedin')
                         i.iconSocialFooter.fi-social-linkedin  
                 .col-lg-4.col-md-4.col-sm-12.col-xs-12.text-center
                   ul.links-footer
                     li
-                      a(href='#',alt='À propos')|À propos
-                    li
-                      a(href='#',alt='Mentions Légales')|Mentions légales 
+                      a(href='aPropos',alt='A propos')|À propos
                 .col-lg-4.col-md-4.col-sm-12.col-xs-12
                   ul.contact-footer.text-center
                     li
@@ -164,6 +162,7 @@ html
     script(type='text/javascript', src='../socket.io.js')
     script(type='text/javascript', src='../socketClient.js')
     script(type='text/javascript', src='../jqueryBlog.js')
+    script(type='text/javascript', src='../main_js_dash.js')
 
 
 
