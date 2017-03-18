@@ -13,14 +13,7 @@ var Users = require('../models/users.js'); //On va mainteant importer notre mod�
 var Chats = require('../models/chat.js'); //On va mainteant importer notre modèle pour pouvoir l'utiliser dans notre application (app/models/user.js)
 var mySecret = config.secret; /* variable qui fait appel a la config pour la verif du token  */
 
-/****************NODE MAILER CONFIG*********************/ 
-var smtpTransport = mailer.createTransport("SMTP",{
-  service: "Gmail",
-	  auth: {
-		  user: "adrienleteinturier@gmail.com",
-			pass: ""
-					}
-});
+
 
 
 //Gestion des Users//
@@ -96,7 +89,7 @@ module.exports = function(app, express, io, mongoose) {
         users.password = req.body.password;
         users.email = req.body.email;
         users.role = 0;
-        users.srcfile = 'http://lorempixel.com/400/200/abstract';
+        users.srcfile = 'uploads/profile_empty.jpg';
         users.presentation = req.body.present;
       } else {
         var users = new Users();
@@ -385,19 +378,31 @@ apiRoutes.route('/post/:_id')
       });      
     })
 /****************ROUTE MODIFIER PROFIL USER CONNECTER*********************/     
-    .post(function(req,res){
+    .post(upload.single('file'),function(req,res){
       Users.find({},function(err,allUser){
         Users.findOne({pseudo: req.session.pseudo}, function(err,user){
           if(err){
             throw err;
           } else {
-            user.age = req.body.age;
-            user.prenom = req.body.prenom;
-            user.nom = req.body.nom;
-            user.pseudo = req.body.pseudo;
-            user.password = req.body.password;
-            user.email = req.body.email;
-            user.presentation = req.body.present;
+            if(!req.file){
+              user.age = req.body.age;
+              user.prenom = req.body.prenom;
+              user.nom = req.body.nom;
+              user.pseudo = req.body.pseudo;
+              user.password = req.body.password;
+              user.email = req.body.email;
+              user.srcfile = 'uploads/profile_empty.jpg';
+              user.presentation = req.body.present;              
+            } else {
+              user.age = req.body.age;
+              user.prenom = req.body.prenom;
+              user.nom = req.body.nom;
+              user.pseudo = req.body.pseudo;
+              user.password = req.body.password;
+              user.email = req.body.email;
+              user.srcfile = 'uploads/' + req.file.filename;
+              user.presentation = req.body.present;
+            }
             user.save(function(err) {
               if(err) {
                 throw err;
@@ -417,48 +422,50 @@ apiRoutes.route('/post/:_id')
       throw err;
     } else {
       Users.findById(req.params._id,function(err,userPublic){
-        Post.find({auteur:userPublic.pseudo},function(err,userPostPublic){
-            if(err) {
-              throw err;
-            } else {
-              if(user.pseudo === userPublic.pseudo){
-                res.redirect('/profil');
-              }
-           //   for(var i = 0; i<user.friends.length;i++){
-                if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1 || user.role === 1){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
-                  res.render('profilFriends',{
-                    userFriend:user.friends,  
-                    pseudo:user.pseudo,
-                    srcfile:user.srcfile,
-                    friends: user.friends.length,
-                    userPublicId : userPublic._id,
-                    userPublicPrenom: userPublic.prenom,
-                    userPublicNom: userPublic.nom,
-                    userPublicSrcFile : userPublic.srcfile,
-                    userPublicPseudo : userPublic.pseudo,
-                    userPublicPresent : userPublic.presentation,
-                    userPublicCountFriends : userPublic.friends.length,
-                    userPubliCountPost : userPostPublic.length,
-                    userPublicMessages : userPublic.messages,
-                    allPostUserFriends : userPostPublic
-                  })
-                } else {
-                  res.render('profilPublic',{
-                    userFriend:user.friends,  
-                    pseudo:user.pseudo,
-                    srcfile:user.srcfile,
-                    friends: user.friends.length,
-                    userPublicId : userPublic._id,
-                    userPublicSrcFile : userPublic.srcfile,
-                    userPublicPseudo : userPublic.pseudo,
-                    userPublicPresent : userPublic.presentation,
-                    userPublicCountFriends : userPublic.friends.length,
-                    userPubliCountPost : userPostPublic.length
-                  });
+        if(err){
+          throw err;
+        } else {
+          Post.find({auteur:userPublic.pseudo},function(err,userPostPublic){
+              if(err) {
+                throw err;
+              } else {
+                if(user.pseudo === userPublic.pseudo){
+                  res.redirect('/profil');
                 }
-            //  }
-            }
-          });
+                  if(user.friends.map(e => e.pseudo).indexOf(userPublic.pseudo) !== -1 || user.role === 1){ //map retourne un tableau de tout mes amis et verifie si la personne est mon amis ou pas 
+                    res.render('profilFriends',{
+                      userFriend:user.friends,  
+                      pseudo:user.pseudo,
+                      srcfile:user.srcfile,
+                      friends: user.friends.length,
+                      userPublicId : userPublic._id,
+                      userPublicPrenom: userPublic.prenom,
+                      userPublicNom: userPublic.nom,
+                      userPublicSrcFile : userPublic.srcfile,
+                      userPublicPseudo : userPublic.pseudo,
+                      userPublicPresent : userPublic.presentation,
+                      userPublicCountFriends : userPublic.friends.length,
+                      userPubliCountPost : userPostPublic.length,
+                      userPublicMessages : userPublic.messages,
+                      allPostUserFriends : userPostPublic
+                    })
+                  } else {
+                    res.render('profilPublic',{
+                      userFriend:user.friends,  
+                      pseudo:user.pseudo,
+                      srcfile:user.srcfile,
+                      friends: user.friends.length,
+                      userPublicId : userPublic._id,
+                      userPublicSrcFile : userPublic.srcfile,
+                      userPublicPseudo : userPublic.pseudo,
+                      userPublicPresent : userPublic.presentation,
+                      userPublicCountFriends : userPublic.friends.length,
+                      userPubliCountPost : userPostPublic.length
+                    });
+                  }
+              }
+            });
+          }
         });
       }
     })
@@ -477,7 +484,7 @@ apiRoutes.route('/post/:_id')
             from: "WriteItSocial@gmail.com",
               to: userPublicInvite.email,
                 subject: "Vous avez reçu une invitation de la part de " + " " + req.session.pseudo,
-                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userPublicInvite.pseudo + "</h2><br><h2>Vous avez reçu une invitation de la part de "+ "<br>" + req.session.pseudo +"</h2><br><a href='http://localhost:8080/validInvite/"+ userPublicInvite._id + "'>Pour accepter l'invitation - Cliquez ICI</a></div>"
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><h2>Bonjour</h2><h2 style='color:#27AAE1;'> " + userPublicInvite.pseudo + "</h2><br><h3>Vous avez reçu une invitation de la part de "+ "<br>" + req.session.pseudo +"</h2><br><a href='http://localhost:8080/validInvite/"+ userPublicInvite._id + "'>Pour accepter l'invitation - Cliquez ICI</a></div>"
             }
             smtpTransport.sendMail(mailMdpLost, function(error, response){
               if(error){
@@ -549,7 +556,7 @@ apiRoutes.route('/post/:_id')
             from: "WriteItSocial@gmail.com",
               to: user.email,
                 subject: userPublicInvite.pseudo + " a confirmé l'invitation " ,
-                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + user.pseudo + "</h2><br><h2>Vous etes maintenant amis avec"+ "<br>" + userPublicInvite.pseudo +"</h2></div>"
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><h2>Bonjour</h2><h2 style='color:#27AAE1;'> " + user.pseudo + "</h2><br><h3>Vous etes maintenant amis avec"+ "<br>" + userPublicInvite.pseudo +"</h3></div>"
             }
             smtpTransport.sendMail(mailMdpLost, function(error, response){
               if(error){
@@ -639,7 +646,7 @@ apiRoutes.route('/post/:_id')
               from: "WriteItSocial@gmail.com",
                 to: userFriends.email,
                   subject: user.pseudo + " Vous à envoyé un message " ,
-                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé un message , vous pouvez repondre à ce message dans votre espace message</h2></div>"
+                  html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><h2>Bonjour</h2><h2 style='color:#27AAE1;'> " + userFriends.pseudo + "</h2><br><h3>" + user.pseudo + "</h3><p> vous à envoyé un message , vous pouvez repondre à ce message dans votre espace message</p></div>"
               }
               smtpTransport.sendMail(mailMdpLost, function(error, response){
                 if(error){
@@ -671,6 +678,15 @@ apiRoutes.route('/post/:_id')
 
 //#################################
 
+/****************NODE MAILER CONFIG*********************/ 
+var smtpTransport = mailer.createTransport("SMTP",{
+  service: "Gmail",
+	  auth: {
+		  user: "writeitsocial@gmail.com",
+			pass: "shareyourtext"
+					}
+});
+
 /****************ROUTE POUR LES CHATS AVANT CONNEXION *********************/ 
   apiRoutes.route('/chat')
     .get(function(req,res){
@@ -688,6 +704,7 @@ apiRoutes.route('/post/:_id')
                 userFriend:user.friends,  
                 pseudo:user.pseudo,
                 srcfile:user.srcfile,
+                userRole : user.role,
                 friends: user.friends.length,
                 listUserChats : userChats
               });
@@ -732,7 +749,7 @@ apiRoutes.route('/post/:_id')
             if(err){
               console.log('error find user session route /chat:_id .get');
             } else {
-                if(user.pseudo == chatSession.hote || chatSession.participants.map(e => e.pseudo).indexOf(user.pseudo) !== -1){
+                if(user.pseudo === chatSession.hote || chatSession.participants.map(e => e.pseudo).indexOf(user.pseudo) !== -1){
                 res.render('roomChat',{
                   userFriend:user.friends,  
                   pseudo:user.pseudo,
@@ -765,7 +782,7 @@ apiRoutes.route('/post/:_id')
                         from: "WriteItSocial@gmail.com",
                           to: userHote.email,
                             subject: user.pseudo + " à rejoins votre chat " ,
-                            html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userHote.pseudo + "</h2><br><h2>" + user.pseudo + " à rejoins votre chat</h2></div>"
+                            html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><h2>Bonjour</h2><h2 style='color:#27AAE1;'> " + userHote.pseudo + "</h2><br><h3>" + user.pseudo + "</h3><p>à rejoins votre chat</p></div>"
                         }
                         smtpTransport.sendMail(mailMdpLost, function(error, response){
                           if(error){
@@ -812,12 +829,22 @@ apiRoutes.route('/post/:_id')
 /****************ROUTE DELETE CHAT *********************/ 
     apiRoutes.route('/deleteChat/:_id')
       .get(function(req,res){
-        Chats.findById(req.params._id, function(err,chat) {
-          if(err) {
-            throw err;
+        Users.findOne({pseudo:req.session.pseudo},function(err,user){
+          if(err){
+            throw err
           } else {
-            chat.remove({});
-            res.redirect('/chat');
+            Chats.findById(req.params._id, function(err,chat) {
+              if(err) {
+                throw err;
+              } else {
+                chat.remove({});
+                if(user.role === 1){
+                  res.redirect('/allChat')
+                } else {
+                  res.redirect('/chat');
+                }
+              }
+            })
           }
         })
       })
@@ -850,7 +877,7 @@ apiRoutes.route('/post/:_id')
                 from: "WriteItSocial@gmail.com",
                 to: userFriends.email,
                 subject: user.pseudo + " Vous à envoyé une invitation à son chat " ,
-                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><p>Bonjour</p><h2 style='color:'#265A88'> " + userFriends.pseudo + "</h2><br><h2>" + user.pseudo + " vous à envoyé une invitation à son chat , accessible sur votre espace chat.</h2></div>"
+                html: "<img src='http://localhost:8080/images/logo-footer.png'/><div class='contentMail'><h2>Bonjour</h2><h2 style='color:#27AAE1;'> " + userFriends.pseudo + "</h2><br><h3>" + user.pseudo + "</h3><p>vous à envoyé une invitation à son chat , accessible sur votre espace chat.</p></div>"
               }
               smtpTransport.sendMail(mailMdpLost, function(error, response){
               if(error){

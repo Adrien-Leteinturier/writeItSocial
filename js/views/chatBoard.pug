@@ -72,6 +72,12 @@ html
                 div
                   a(href='chat')
                     | Chat
+              if(userRole === 1)      
+                li
+                  i.icon.fi-comments     
+                  div
+                    a(href='allChat')
+                      | Tout les chats                      
             #chat-block.hidden-sm.hidden-xs
               div.title
                 |Mes amis

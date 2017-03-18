@@ -121,6 +121,7 @@
 /*------------------Search bar end---------------------*/
 
 
+
 /*-----------------Ajax Create Post-------------------------*/
  
     $('#form-create-post').submit(function(event) {
@@ -155,6 +156,21 @@
         })
         $('#create-message-textarea').val('')
     });
+
+/*-----------------Ajax Modify Profile-------------------------*/
+    $('#formModifyProfil').submit(function(event) {
+        event.preventDefault();
+        var data = new FormData(this);
+        $.ajax({
+            method: 'POST',
+            url: '/profil',
+            contentType: false,
+            processData: false,
+            data: data
+        }).done(function(result) {
+            location.reload(true);
+        })
+    });    
 
 
 /*-----------------Ajax delete message-------------------------*/

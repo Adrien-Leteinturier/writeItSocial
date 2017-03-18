@@ -106,9 +106,12 @@ html
                       h3|Votre e-mail
                       input#email(type='email',name='email',value=email)
                     li
+                      h3|Photo de profil  
+                      input#file(type='file',name='file', multiple accept='image/*')                        
+                    li
                       h3|Votre presentation
                       textarea#presentation(name='present', maxlenght='140',placeholder=presentation)
-                  button.btn.btn-primary.button-modify-post(type='submit')
+                  button.btn.btn-primary.button-modify-profile(type='submit')
                     |Modifier
                   a.btn.btn-primary.pull-right.button-delete-user(href="/deleteProfil/" + userId,alt='delete post',title='Supprimer')
                     |Supprimer 
